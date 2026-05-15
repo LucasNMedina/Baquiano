@@ -1,0 +1,12 @@
+[
+    {
+        "codigo": "10",
+        "nombre": "Plusbelle",
+        "precio": 2500.0
+    },
+    {
+        "codigo": "11",
+        "nombre": "Caf\u00e9",
+        "precio": 5400.0
+    }
+]
