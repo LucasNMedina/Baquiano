@@ -20,7 +20,7 @@ def get_menu_number(): #Obtiene un número y lo devuelve
 def validate_menu(range_a, range_b): #Valida que la respuesta del menú sea correcta y la devuelve
     while True:
         answer = get_menu_number()
-        if answer > range_a and answer< range_b:
+        if answer >= range_a and answer <= range_b:
             return answer
         else:
             print("Opción fuera de rango.")
@@ -91,7 +91,7 @@ def modify_product(inventory_list):
         print("Producto no encontrado.")
     else:
         modification_menu(p)
-        rta = validate_menu(0,4)
+        rta = validate_menu(1,3)
         match rta:
             case 1:
                 modification_name(p)
@@ -113,7 +113,7 @@ def show_products(inventory_list): #Muestra los productos en la lista
 inventario = db.load_file()
 while True:
     menu()
-    rta = validate_menu(0,6)
+    rta = validate_menu(1,5)
 
     match rta:
         case 1:
