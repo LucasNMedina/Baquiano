@@ -8,5 +8,10 @@
         "codigo": "11",
         "nombre": "Caf\u00e9",
         "precio": 5400.0
+    },
+    {
+        "codigo": "12",
+        "nombre": "Matecocido",
+        "precio": 3000.0
     }
 ]
