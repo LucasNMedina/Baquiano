@@ -65,7 +65,6 @@ class AgregarAPP(ctk.CTkToplevel):
                 self.inventario.append(nuevo_producto)
                 db.save_file(self.inventario)
 
-                print(f"¡{nombre} agregado con éxito!")
                 self.destroy() # Cierra la ventanita automáticamente al terminar
 
 # --- VENTANA EMERGENTE PARA MODIFICAR PRODUCTO ---
@@ -73,8 +72,9 @@ class ModificarApp(ctk.CTkToplevel):
     def __init__(self, parent, inventario):
         super().__init__(parent)
         self.title("Modificar producto")
-        self.geometry("350x250")
+        self.geometry("350x100")
         self.inventario = inventario
+        self.producto_a_modificar = None
 
         self.grab_set()
 
@@ -83,11 +83,70 @@ class ModificarApp(ctk.CTkToplevel):
 
         self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300, height=15)
         self.entrada_codigo.pack(pady = 5)
-        self.entrada_codigo.bind("<Return>", self.mostrar_producto)
+        self.entrada_codigo.bind("<Return>", self.modificar_producto)
 
-    def mostrar_producto():
-        pass
+        self.label_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
+        self.label_error.pack(pady = 5)
 
+        #Solo creo los labels pero todavia no lo muestro
+        self.label_consulta = ctk.CTkLabel(self, text="¿Qué deseas modificar del producto? ", font=("Arial", 12))
+        self.label_nombre = ctk.CTkLabel(self, text="", font=("Arial", 12))
+        self.entry_nombre = ctk.CTkEntry(self, placeholder_text="Nuevo nombre", width=200, height=15)
+        self.label_precio = ctk.CTkLabel(self, text="", font=("Arial", 12))
+        self.entry_precio = ctk.CTkEntry(self, placeholder_text="Nuevo precio", width=200, height=15)
+    
+        self.boton_finalizar = ctk.CTkButton(self, text="Guardar producto", command=self.guardar_cambios)
+    
+    def modificar_producto(self, event):
+        codigo = self.entrada_codigo.get()
+        if not db.product_exist(self.inventario, codigo):
+            self.label_error.configure(text="El producto no se encuentra en la base de datos.")
+            self.entrada_codigo.delete(0, "end")
+        else:
+            self.geometry("350x325")
+            self.label_error.configure(text="")
+            self.producto_a_modificar = db.get_product_by_code(self.inventario, codigo)
+
+            #hago aparecer los labels
+            self.label_consulta.pack(pady = 2)
+            
+            #---Nombre---
+            self.label_nombre.configure(text=f"Nombre : {self.producto_a_modificar.nombre}")
+            self.label_nombre.pack(pady = 5)
+            self.entry_nombre.pack(pady = 1)
+
+            #---Precio---
+            self.label_precio.configure(text=f"Precio : ${self.producto_a_modificar.precio}")
+            self.label_precio.pack(pady = 5)
+            self.entry_precio.pack(pady = 1)
+
+            #--Boton--
+            self.boton_finalizar.pack(pady = 10)
+
+    def guardar_cambios(self):
+        nuevo_nombre = self.entry_nombre.get().strip().capitalize()
+        nuevo_precio_texto = self.entry_precio.get()
+
+        if not nuevo_nombre and not nuevo_precio_texto:
+            self.label_error.configure(text="Al menos uno de los campos debe ser cambiado.")
+            self.label_error.pack()
+            return
+        
+        # 2. Si escribió un nombre nuevo, lo actualizamos
+        if nuevo_nombre:
+            self.producto_a_modificar.nombre = nuevo_nombre
+
+        # 3. Si escribió un precio nuevo, lo validamos e intentamos actualizarlo
+        if nuevo_precio_texto:
+            try:
+                self.producto_a_modificar.precio = float(nuevo_precio_texto)
+            except ValueError:
+                self.label_error.configure(text="El valor en precio no es válido.")
+                return
+
+        # 4. Si todo salió bien, guardamos el archivo completo y cerramos la ventana
+        db.save_file(self.inventario)
+        self.destroy()
 
 # --- VENTANA PRINCIPAL DE ADMINISTRACIÓN ---
 class AdminAPP(ctk.CTk):
