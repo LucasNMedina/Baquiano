@@ -102,9 +102,11 @@ class ModificarApp(ctk.CTkToplevel):
         if not db.product_exist(self.inventario, codigo):
             self.label_error.configure(text="El producto no se encuentra en la base de datos.")
             self.entrada_codigo.delete(0, "end")
+            self.entrada_codigo.focus()
         else:
             self.geometry("350x325")
             self.label_error.configure(text="")
+            self.label_error.pack()
             self.producto_a_modificar = db.get_product_by_code(self.inventario, codigo)
 
             #hago aparecer los labels
@@ -122,6 +124,7 @@ class ModificarApp(ctk.CTkToplevel):
 
             #--Boton--
             self.boton_finalizar.pack(pady = 10)
+            self.entrada_codigo.configure(state="disabled")
 
     def guardar_cambios(self):
         nuevo_nombre = self.entry_nombre.get().strip().capitalize()
@@ -129,7 +132,6 @@ class ModificarApp(ctk.CTkToplevel):
 
         if not nuevo_nombre and not nuevo_precio_texto:
             self.label_error.configure(text="Al menos uno de los campos debe ser cambiado.")
-            self.label_error.pack()
             return
         
         # 2. Si escribió un nombre nuevo, lo actualizamos
@@ -169,8 +171,8 @@ class EliminarAPP(ctk.CTkToplevel):
         self.label_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
         self.label_error.pack(pady = 5)
 
-        self.label_nombre_producto = ctk.CTkLabel(self, text="", font=("Ariel", 12))
-        self.label_precio_producto = ctk.CTkLabel(self, text="", font=("Ariel", 12))
+        self.label_nombre_producto = ctk.CTkLabel(self, text="", font=("Arial", 12))
+        self.label_precio_producto = ctk.CTkLabel(self, text="", font=("Arial", 12))
 
         self.boton_eliminar = ctk.CTkButton(self, text="Eliminar", command=self.eliminar_producto)
 
@@ -179,6 +181,7 @@ class EliminarAPP(ctk.CTkToplevel):
         if not db.product_exist(self.inventario, codigo):
             self.label_error.configure(text="El producto no se encuentra en la base de datos.")
             self.entrada_codigo.delete(0, "end")
+            self.entrada_codigo.focus()
         else:
             self.label_error.configure(text="")
             self.geometry("350x250")
@@ -191,6 +194,7 @@ class EliminarAPP(ctk.CTkToplevel):
             self.label_precio_producto.pack(pady = 1)
 
             self.boton_eliminar.pack(pady = 5)
+            self.entrada_codigo.configure(state="disabled")
 
     def eliminar_producto(self):
         if self.producto_a_eliminar in self.inventario:
@@ -220,8 +224,8 @@ class MostrarAPP(ctk.CTkToplevel):
         self.label_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
         self.label_error.pack(pady = 5)
         
-        self.label_nombre_producto = ctk.CTkLabel(self, text="", font=("Ariel", 12))
-        self.label_precio_producto = ctk.CTkLabel(self, text="", font=("Ariel", 12))
+        self.label_nombre_producto = ctk.CTkLabel(self, text="", font=("Arial", 12))
+        self.label_precio_producto = ctk.CTkLabel(self, text="", font=("Arial", 12))
         self.boton_volver = ctk.CTkButton(self, text="Volver", command=self.volver_atras)
 
     def ventana_mostrar(self, event):
@@ -229,6 +233,7 @@ class MostrarAPP(ctk.CTkToplevel):
         if not db.product_exist(self.inventario, codigo):
             self.label_error.configure(text="El producto no se encuentra en la base de datos.")
             self.entrada_codigo.delete(0, "end")
+            self.entrada_codigo.focus()
         else:
             self.producto_a_mostrar = db.get_product_by_code(self.inventario, codigo)
             self.label_error.configure(text="")
@@ -241,6 +246,7 @@ class MostrarAPP(ctk.CTkToplevel):
             self.label_precio_producto.pack(pady = 2)
 
             self.boton_volver.pack(pady = 5)
+            self.entrada_codigo.configure(state="disabled")
 
     def volver_atras(self):
         self.destroy()
