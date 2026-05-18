@@ -44,7 +44,7 @@ class AgregarAPP(ctk.CTkToplevel):
 
     def add_product(self):
             codigo = self.entrada_codigo.get().strip()
-            nombre = self.entrada_nombre_producto.get().strip()
+            nombre = self.entrada_nombre_producto.get().strip().capitalize()
             precio_texto = self.entrada_precio_producto.get().strip()
 
             #No dejar vacios
@@ -68,7 +68,7 @@ class AgregarAPP(ctk.CTkToplevel):
                 print(f"¡{nombre} agregado con éxito!")
                 self.destroy() # Cierra la ventanita automáticamente al terminar
 
-# --- VENTANA EMERGENTE PARA AGREGAR PRODUCTO ---
+# --- VENTANA EMERGENTE PARA MODIFICAR PRODUCTO ---
 class ModificarApp(ctk.CTkToplevel):
     def __init__(self, parent, inventario):
         super().__init__(parent)
@@ -77,6 +77,17 @@ class ModificarApp(ctk.CTkToplevel):
         self.inventario = inventario
 
         self.grab_set()
+
+        self.label_modificar = ctk.CTkLabel(self, text="Escaneá el producto que queres modificar", font=("Arial",12))
+        self.label_modificar.pack(pady = 5)
+
+        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300, height=15)
+        self.entrada_codigo.pack(pady = 5)
+        self.entrada_codigo.bind("<Return>", self.mostrar_producto)
+
+    def mostrar_producto():
+        pass
+
 
 # --- VENTANA PRINCIPAL DE ADMINISTRACIÓN ---
 class AdminAPP(ctk.CTk):
