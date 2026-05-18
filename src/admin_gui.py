@@ -7,7 +7,7 @@ class AgregarAPP(ctk.CTkToplevel):
     def __init__(self, parent, inventario):
         super().__init__(parent)
         self.title("Nuevo Producto")
-        self.geometry("350x280")
+        self.geometry("350x300")
         self.inventario = inventario
 
         # Esto hace que Florencia tenga que cerrar esta ventana antes de volver a tocar la principal
@@ -34,8 +34,9 @@ class AgregarAPP(ctk.CTkToplevel):
         self.entrada_precio_producto = ctk.CTkEntry(self, placeholder_text="1500", width=300, height=15)
         self.entrada_precio_producto.pack(pady = 5)
 
-        #-----CONTINUAR ACAAAAA
-        #self.label_error = ctk.CTkLabel(self, text="")
+        
+        self.label_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
+        self.label_error.pack(pady = 5)
 
         #Boton agregar
         self.boton_finalizar = ctk.CTkButton(self, text="Guardar producto", command=self.add_product)
@@ -48,17 +49,17 @@ class AgregarAPP(ctk.CTkToplevel):
 
             #No dejar vacios
             if not codigo or not nombre or not precio_texto:
-                print("Todos los campos son obligatorios.")
+                self.label_error.configure(text="Todos los campos son obligatorios.")
                 return
 
             try:
                  precio = float(precio_texto)
             except ValueError:
-                print("Error! El precio ingresado no es valido.")
+                self.label_error.configure(text="El valor en precio no es valido.")
                 return
             
             if db.product_exist(self.inventario,codigo):
-                print("Error: El producto ya existe en el sistema.")
+                self.label_error.configure(text="El producto ya existe en el sistema.")
             else:
                 nuevo_producto = Producto(codigo, nombre, precio)
                 self.inventario.append(nuevo_producto)
@@ -66,6 +67,16 @@ class AgregarAPP(ctk.CTkToplevel):
 
                 print(f"¡{nombre} agregado con éxito!")
                 self.destroy() # Cierra la ventanita automáticamente al terminar
+
+# --- VENTANA EMERGENTE PARA AGREGAR PRODUCTO ---
+class ModificarApp(ctk.CTkToplevel):
+    def __init__(self, parent, inventario):
+        super().__init__(parent)
+        self.title("Modificar producto")
+        self.geometry("350x250")
+        self.inventario = inventario
+
+        self.grab_set()
 
 # --- VENTANA PRINCIPAL DE ADMINISTRACIÓN ---
 class AdminAPP(ctk.CTk):
@@ -81,16 +92,16 @@ class AdminAPP(ctk.CTk):
         self.boton_agregar_producto = ctk.CTkButton(self, text="Agregar Producto", command=self.abrir_ventana_agregar)
         self.boton_agregar_producto.pack(pady = 5)
 
+        self.boton_modificar_producto = ctk.CTkButton(self, text="Modificar Producto", command=self.abrir_ventana_modificar)
+        self.boton_modificar_producto.pack(pady = 5)
+
     def abrir_ventana_agregar(self):
         # Abrimos la ventana emergente pasándole el inventario actual
         AgregarAPP(self, self.inventario)
-    #def agregar_producto():
+    
+    def abrir_ventana_modificar(self):
+        ModificarApp(self,self.inventario)
+
 if __name__ == "__main__":
     app = AdminAPP()
     app.mainloop()
-
-"""
-        #Lector codigo de barras
-        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Escaneá el código de barras", width=300, height=15)
-        self.entrada_codigo.pack(pady = 5)
-"""
