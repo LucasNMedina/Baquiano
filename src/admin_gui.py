@@ -259,7 +259,7 @@ class AdminAPP(ctk.CTkToplevel):
         self.geometry("400x210")
         self.inventario = db.load_file()
 
-        self.label_bienvenida = ctk.CTkLabel(self, text="Bienvenida Florencia - ¿Qué hacemos hoy?", font=("Arial",14), text_color="orange")
+        self.label_bienvenida = ctk.CTkLabel(self, text="Administración de productos", font=("Arial",16), text_color="orange")
         self.label_bienvenida.pack(pady = 5)
 
         self.boton_agregar_producto = ctk.CTkButton(self, text="Agregar Producto", command=self.abrir_ventana_agregar)
