@@ -252,9 +252,9 @@ class MostrarAPP(ctk.CTkToplevel):
         self.destroy()
 
 # --- VENTANA PRINCIPAL DE ADMINISTRACIÓN ---
-class AdminAPP(ctk.CTk):
-    def __init__(self, fg_color = None, **kwargs):
-        super().__init__()
+class AdminAPP(ctk.CTkToplevel):
+    def __init__(self, parent=None, fg_color = None, **kwargs):
+        super().__init__(parent)
         self.title(" Baquiano - Administración")
         self.geometry("400x210")
         self.inventario = db.load_file()

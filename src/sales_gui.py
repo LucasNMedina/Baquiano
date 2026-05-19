@@ -1,9 +1,10 @@
 import customtkinter as ctk
 import database as db
 
-class SalesApp(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+class SalesAPP(ctk.CTkToplevel):
+    def __init__(self, parent=None, **kwargs):
+        super().__init__(parent)
+        self.grab_set()
         self.title("Baquiano - Ventas")
         self.geometry("500x550")
         self.database = db.load_file()
@@ -18,7 +19,7 @@ class SalesApp(ctk.CTk):
         self.entrada_codigo.bind("<Return>", self.vender_producto)
 
         #Label de total
-        self.label_total = ctk.CTkLabel(self, text=f"Total: ${self.total_cuenta:.2f}", text_color="red", font=("Arial", 25))
+        self.label_total = ctk.CTkLabel(self, text=f"Total: ${self.total_cuenta:.2f}", text_color="orange", font=("Arial", 25))
         self.label_total.pack(pady = 5)
 
         self.label_mostrar_codigo = ctk.CTkLabel(self, text="")
@@ -81,5 +82,5 @@ class SalesApp(ctk.CTk):
         self.lista_compras.see("end")
 
 if __name__ == "__main__":
-    app = SalesApp()
+    app = SalesAPP()
     app.mainloop()
