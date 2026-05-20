@@ -33,6 +33,7 @@ class SalesAPP(ctk.CTkToplevel):
         self.boton_finalizar.pack(pady = 15)
 
     def vender_producto(self, event):
+        self.inventario = db.load_file() #Cargo el inventario por las dudas.
         codigo = self.entrada_codigo.get().strip()
 
         if db.product_exist(self.database, codigo):

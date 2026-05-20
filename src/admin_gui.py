@@ -10,6 +10,8 @@ class AgregarAPP(ctk.CTkToplevel):
         self.geometry("350x300")
         self.inventario = inventario
 
+        self.inventario = db.load_file() #Cargo el inventario antes de agregar.
+
         # Esto hace que Florencia tenga que cerrar esta ventana antes de volver a tocar la principal
         self.grab_set()
 
@@ -74,6 +76,7 @@ class ModificarApp(ctk.CTkToplevel):
         self.title("Modificar producto")
         self.geometry("350x100")
         self.inventario = inventario
+        self.inventario = db.load_file()
         self.producto_a_modificar = None
 
         self.grab_set()
@@ -157,6 +160,7 @@ class EliminarAPP(ctk.CTkToplevel):
         self.title("Eliminar producto")
         self.geometry("350x100")
         self.inventario = inventario
+        self.inventario = db.load_file()
         self.producto_a_eliminar = None
 
         self.grab_set()
@@ -210,6 +214,7 @@ class MostrarAPP(ctk.CTkToplevel):
         self.title("Mostrar producto")
         self.geometry("350x150")
         self.inventario = inventario
+        self.inventario = db.load_file()
         self.producto_a_mostrar = None
 
         self.grab_set()
