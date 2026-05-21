@@ -14,7 +14,7 @@ class SalesAPP(ctk.CTkToplevel):
         self.label_entrada.pack(pady = 5)
 
         #Lector codigo de barras
-        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300, height=15)
+        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300)
         self.entrada_codigo.pack(pady = 5)
         self.entrada_codigo.bind("<Return>", self.vender_producto)
 

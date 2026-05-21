@@ -19,21 +19,21 @@ class AgregarAPP(ctk.CTkToplevel):
         self.label_entrada.pack(pady = 5)
 
         #Lector codigo de barras
-        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300, height=15)
+        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300)
         self.entrada_codigo.pack(pady = 5)
 
         self.label_nombre_producto = ctk.CTkLabel(self, text="Coloca el nombre del producto: ", font=("Arial", 15))
         self.label_nombre_producto.pack(pady = 5)
 
         #Entrada nombre
-        self.entrada_nombre_producto = ctk.CTkEntry(self, placeholder_text="Yerba 'Playadito'", width=300, height=15)
+        self.entrada_nombre_producto = ctk.CTkEntry(self, placeholder_text="Yerba 'Playadito'", width=300)
         self.entrada_nombre_producto.pack(pady = 5)
 
         self.label_precio_producto = ctk.CTkLabel(self, text="Coloca el precio del producto: ", font=("Arial", 15))
         self.label_precio_producto.pack(pady = 5)
 
         #Entrada precio
-        self.entrada_precio_producto = ctk.CTkEntry(self, placeholder_text="1500", width=300, height=15)
+        self.entrada_precio_producto = ctk.CTkEntry(self, placeholder_text="1500", width=300)
         self.entrada_precio_producto.pack(pady = 5)
 
         
@@ -84,7 +84,7 @@ class ModificarApp(ctk.CTkToplevel):
         self.label_modificar = ctk.CTkLabel(self, text="Escaneá el producto que queres modificar", font=("Arial",12))
         self.label_modificar.pack(pady = 5)
 
-        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300, height=15)
+        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300)
         self.entrada_codigo.pack(pady = 5)
         self.entrada_codigo.bind("<Return>", self.modificar_producto)
 
@@ -168,7 +168,7 @@ class EliminarAPP(ctk.CTkToplevel):
         self.label_modificar = ctk.CTkLabel(self, text="Escaneá el producto que queres eliminar", font=("Arial",12))
         self.label_modificar.pack(pady = 5)
 
-        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300, height=15)
+        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300)
         self.entrada_codigo.pack(pady = 5)
         self.entrada_codigo.bind("<Return>", self.ventana_eliminar)
 
@@ -222,7 +222,7 @@ class MostrarAPP(ctk.CTkToplevel):
         self.label_modificar = ctk.CTkLabel(self, text="Escaneá el producto que queres mostrar", font=("Arial",12))
         self.label_modificar.pack(pady = 5)
 
-        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300, height=15)
+        self.entrada_codigo = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300)
         self.entrada_codigo.pack(pady = 5)
         self.entrada_codigo.bind("<Return>", self.ventana_mostrar)
 
