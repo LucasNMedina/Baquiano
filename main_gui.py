@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from src.core.database import inicializar_db
 from src.gui.admin_gui import AdminAPP
 from src.gui.sales_gui import SalesAPP
 
@@ -57,5 +58,6 @@ if __name__ == "__main__":
     ctk.set_appearance_mode("System")  # Toma el color del sistema (Claro/Oscuro)
     ctk.set_default_color_theme("blue") # Tema azul por defecto
     
+    inicializar_db()
     app = MenuPrincipal()
     app.mainloop()

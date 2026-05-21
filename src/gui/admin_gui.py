@@ -45,29 +45,26 @@ class AgregarAPP(ctk.CTkToplevel):
         self.boton_finalizar.pack(pady = 5)
 
     def add_product(self):
-            codigo = self.entrada_codigo.get().strip()
-            nombre = self.entrada_nombre_producto.get().strip().capitalize()
-            precio_texto = self.entrada_precio_producto.get().strip()
+            code = self.entrada_codigo.get().strip()
+            name = self.entrada_nombre_producto.get().strip().capitalize()
+            price_txt = self.entrada_precio_producto.get().strip()
 
             #No dejar vacios
-            if not codigo or not nombre or not precio_texto:
+            if not code or not name or not price_txt:
                 self.label_error.configure(text="Todos los campos son obligatorios.")
                 return
 
             try:
-                 precio = float(precio_texto)
+                 price = float(price_txt)
             except ValueError:
                 self.label_error.configure(text="El valor en precio no es valido.")
                 return
             
-            if db.product_exist(self.inventario,codigo):
-                self.label_error.configure(text="El producto ya existe en el sistema.")
+            exito = db.add_product_db(code, name, price)
+            if exito:
+                self.destroy()
             else:
-                nuevo_producto = Producto(codigo, nombre, precio)
-                self.inventario.append(nuevo_producto)
-                db.save_file(self.inventario)
-
-                self.destroy() # Cierra la ventanita automáticamente al terminar
+                self.label_error.configure(text="El producto ya existe en el sistema.")
 
 # --- VENTANA EMERGENTE PARA MODIFICAR PRODUCTO ---
 class ModificarApp(ctk.CTkToplevel):
