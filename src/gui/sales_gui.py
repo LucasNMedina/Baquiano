@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import database as db
+import src.core.database as db
 
 class SalesAPP(ctk.CTkToplevel):
     def __init__(self, parent=None, **kwargs):

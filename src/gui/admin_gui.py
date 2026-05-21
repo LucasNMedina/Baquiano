@@ -1,6 +1,6 @@
 import customtkinter as ctk
-import database as db
-from models import Producto
+import src.core.database as db
+from src.core.models import Producto
 
 # --- VENTANA EMERGENTE PARA AGREGAR PRODUCTO ---
 class AgregarAPP(ctk.CTkToplevel):

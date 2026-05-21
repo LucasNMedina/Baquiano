@@ -1,6 +1,6 @@
 import customtkinter as ctk
-from admin_gui import AdminAPP
-from sales_gui import SalesAPP
+from src.gui.admin_gui import AdminAPP
+from src.gui.sales_gui import SalesAPP
 
 class MenuPrincipal(ctk.CTk):
     def __init__(self):

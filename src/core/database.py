@@ -1,8 +1,8 @@
 import json
-from models import Producto
+from src.core.models import Producto
 
 def save_file(list_products): #Guarda el archivo
-    with open("inventory.json", "w") as archive:
+    with open("data/inventory.json", "w") as archive:
         # Convierto cada objeto Producto a diccionario
         data_to_save = [p.to_dict() for p in list_products]
 
@@ -12,7 +12,7 @@ def save_file(list_products): #Guarda el archivo
 
 def load_file(): #Carga el archivo
     try:
-        with open("inventory.json", "r") as archive:
+        with open("data/inventory.json", "r") as archive:
             data = json.load(archive)
 
             # Convertimos cada diccionario de nuevo en un objeto Producto
