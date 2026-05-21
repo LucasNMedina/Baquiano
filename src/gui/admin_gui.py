@@ -90,7 +90,7 @@ class ModificarApp(ctk.CTkToplevel):
         self.label_precio = ctk.CTkLabel(self, text="", font=("Arial", 12))
         self.entry_precio = ctk.CTkEntry(self, placeholder_text="Nuevo precio", width=200, height=15)
     
-        self.boton_finalizar = ctk.CTkButton(self, text="Guardar producto", command=self.guardar_cambios)
+        self.boton_finalizar = ctk.CTkButton(self, text="Guardar producto", command=self.finalizar_modificacion)
     
     def modificar_producto(self, event):
         codigo = self.entrada_codigo.get()
@@ -122,27 +122,40 @@ class ModificarApp(ctk.CTkToplevel):
             self.entrada_codigo.delete(0, "end")
             self.entrada_codigo.focus()
 
-    def guardar_cambios(self):
-        nuevo_nombre = self.entry_nombre.get().strip().capitalize()
-        nuevo_precio_texto = self.entry_precio.get()
+    def finalizar_modificacion(self):
+        # 1. Recuperamos el código del producto que se buscó
+        codigo = self.producto_a_modificar.codigo
 
+        # 2. Leemos los entry
+        nuevo_nombre = self.entry_nombre.get().strip().capitalize()
+        nuevo_precio_texto = self.entry_precio.get().strip()
+
+        # Usamos validación: Si no escribió nada en ningún lado, avisamos
         if not nuevo_nombre and not nuevo_precio_texto:
             self.label_error.configure(text="Al menos uno de los campos debe ser cambiado.")
             return
         
-        # 2. Si escribió un nombre nuevo, lo actualizamos
-        if nuevo_nombre:
-            self.producto_a_modificar.nombre = nuevo_nombre
+        # Si dejó el nombre vacío, se queda con el que ya tenía antes
+        if not nuevo_nombre:
+            nuevo_nombre = self.producto_a_modificar.nombre
 
-        # 3. Si escribió un precio nuevo, lo validamos e intentamos actualizarlo
+        # Si dejó el precio vacío, se queda con el de antes. Si escribió, lo validamos
         if nuevo_precio_texto:
             try:
-                self.producto_a_modificar.precio = float(nuevo_precio_texto)
+                nuevo_precio = float(nuevo_precio_texto)
             except ValueError:
                 self.label_error.configure(text="El valor en precio no es válido.")
                 return
-            
-        self.destroy()
+        else:
+            nuevo_precio = self.producto_a_modificar.precio
+
+        # 🛠️ ¡LA MAGIA NUEVA! Mandamos los datos limpios y finales a la base de datos
+        exito = db.update_product_db(codigo, nuevo_nombre, nuevo_precio)
+        
+        if exito:
+            self.destroy()
+        else:
+            self.label_error.configure(text="Error al guardar en la base de datos.")
 
 # --- VENTANA EMERGENTE PARA ELIMINAR PRODUCTO ---
 class EliminarAPP(ctk.CTkToplevel):
@@ -221,12 +234,9 @@ class MostrarAPP(ctk.CTkToplevel):
 
     def ventana_mostrar(self, event):
         codigo = self.entrada_codigo.get()
-        if not db.product_exist(codigo):
-            self.label_error.configure(text="El producto no se encuentra en la base de datos.")
-            self.entrada_codigo.delete(0, "end")
-            self.entrada_codigo.focus()
-        else:
-            self.producto_a_mostrar = db.get_product_by_code(codigo)
+        self.producto_a_mostrar = db.get_product_by_code(codigo)
+
+        if self.producto_a_mostrar:
             self.label_error.configure(text="")
             self.geometry("350x225")
 
@@ -238,6 +248,10 @@ class MostrarAPP(ctk.CTkToplevel):
 
             self.boton_volver.pack(pady = 5)
             self.entrada_codigo.configure(state="disabled")
+        else:
+            self.label_error.configure(text="El producto no se encuentra en la base de datos.")
+            self.entrada_codigo.delete(0, "end")
+            self.entrada_codigo.focus()
 
     def volver_atras(self):
         self.destroy()

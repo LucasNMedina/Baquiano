@@ -1,7 +1,19 @@
 import sqlite3
+import os
 from src.core.models import Producto
 
 DB_PATH = "data/baquiano.db"
+
+"""
+# --- CONFIGURACIÓN DE RUTAS ABSOLUTAS (A prueba de fallos de OneDrive) ---
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+DB_PATH = os.path.join(DATA_DIR, "baquiano.db")
+
+if not os.path.exists(DATA_DIR):
+    os.makedirs(DATA_DIR)
+# -------------------------------------------------------------------------
+"""
 
 def inicializar_db():
     """Crea la tabla de productos si no existe al arrancar el programa."""
@@ -10,9 +22,9 @@ def inicializar_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS productos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            codigo TEXT UNIQUE,
-            nombre TEXT,
-            precio REAL
+            code TEXT UNIQUE,
+            name TEXT,
+            price REAL
         )
     """)
     conexion.commit() # Si no ponés "commit", los datos se pierden al cerrar la conexión.
@@ -41,13 +53,13 @@ def get_product_by_code(code):
     """Busca un producto por su código y devuelve un objeto Producto (o None)."""
     conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
-    cursor.execute("SELECT code, name, precio FROM productos WHERE code = ?", (code,))
-    resultado = cursor.fetchone()
-    conexion.close
+    cursor.execute("SELECT code, name, price FROM productos WHERE code = ?", (code,))
+    result = cursor.fetchone()
+    conexion.close()
 
-    if resultado:
+    if result:
         # Transformo la tupla de la DB en el objeto Producto
-        return Producto(resultado[0], resultado[1], resultado[2])
+        return Producto(result[0], result[1], result[2])
     return None
 
 def delete_product_db(code):
@@ -63,3 +75,16 @@ def delete_product_db(code):
     finally:
         conexion.close()
 
+def update_product_db(code, new_name, new_price):
+    """Actualiza el nombre y el precio de un producto usando su código."""
+    conexion = sqlite3.connect(DB_PATH)
+    cursor = conexion.cursor()
+    try:
+        cursor.execute("UPDATE productos SET name = ?, price = ? WHERE code = ?", (new_name, new_price, code))
+        conexion.commit()
+        return True
+    except sqlite3.Error as e:
+        print(f"Error al actualizar en la DB: {e}")
+        return False
+    finally:
+        conexion.close()
