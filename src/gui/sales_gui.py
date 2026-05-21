@@ -7,7 +7,7 @@ class SalesAPP(ctk.CTkToplevel):
         self.grab_set()
         self.title("Baquiano - Ventas")
         self.geometry("500x550")
-        self.database = db.load_file()
+        #self.database = db.load_file()
         self.total_cuenta = 0.0
         
         self.label_entrada = ctk.CTkLabel(self, text="Escaneá el código de barras: ", font=("Arial", 15))
@@ -33,15 +33,14 @@ class SalesAPP(ctk.CTkToplevel):
         self.boton_finalizar.pack(pady = 15)
 
     def vender_producto(self, event):
-        self.inventario = db.load_file() #Cargo el inventario por las dudas.
+        #self.inventario = db.load_file() #Cargo el inventario por las dudas.
         codigo = self.entrada_codigo.get().strip()
+        producto = db.get_product_by_code(codigo)
 
-        if db.product_exist(self.database, codigo):
-            producto = db.get_product_by_code(self.database, codigo)
+        if db.product_exist(codigo):
             self.total_cuenta += producto.precio
             self.label_total.configure(text=f"Total: ${self.total_cuenta:.2f}")
             self.actualizar_textbox(producto.nombre, producto.precio)
-            
             self.entrada_codigo.delete(0, "end")
         elif codigo.startswith("+"):
             try:

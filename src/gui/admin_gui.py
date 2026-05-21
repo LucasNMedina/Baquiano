@@ -4,15 +4,12 @@ from src.core.models import Producto
 
 # --- VENTANA EMERGENTE PARA AGREGAR PRODUCTO ---
 class AgregarAPP(ctk.CTkToplevel):
-    def __init__(self, parent, inventario):
+    def __init__(self, parent):
         super().__init__(parent)
         self.title("Nuevo Producto")
         self.geometry("350x300")
-        self.inventario = inventario
 
-        self.inventario = db.load_file() #Cargo el inventario antes de agregar.
-
-        # Esto hace que Florencia tenga que cerrar esta ventana antes de volver a tocar la principal
+        # Esto hace que tenga que cerrar esta ventana antes de volver a tocar la principal
         self.grab_set()
 
         self.label_entrada = ctk.CTkLabel(self, text="Escaneá el código de barras: ", font=("Arial", 15))
@@ -68,12 +65,10 @@ class AgregarAPP(ctk.CTkToplevel):
 
 # --- VENTANA EMERGENTE PARA MODIFICAR PRODUCTO ---
 class ModificarApp(ctk.CTkToplevel):
-    def __init__(self, parent, inventario):
+    def __init__(self, parent):
         super().__init__(parent)
         self.title("Modificar producto")
         self.geometry("350x100")
-        self.inventario = inventario
-        self.inventario = db.load_file()
         self.producto_a_modificar = None
 
         self.grab_set()
@@ -99,15 +94,12 @@ class ModificarApp(ctk.CTkToplevel):
     
     def modificar_producto(self, event):
         codigo = self.entrada_codigo.get()
-        if not db.product_exist(self.inventario, codigo):
-            self.label_error.configure(text="El producto no se encuentra en la base de datos.")
-            self.entrada_codigo.delete(0, "end")
-            self.entrada_codigo.focus()
-        else:
+        self.producto_a_modificar = db.get_product_by_code(codigo)
+
+        if self.producto_a_modificar:
             self.geometry("350x325")
             self.label_error.configure(text="")
             self.label_error.pack()
-            self.producto_a_modificar = db.get_product_by_code(self.inventario, codigo)
 
             #hago aparecer los labels
             self.label_consulta.pack(pady = 2)
@@ -125,6 +117,10 @@ class ModificarApp(ctk.CTkToplevel):
             #--Boton--
             self.boton_finalizar.pack(pady = 10)
             self.entrada_codigo.configure(state="disabled")
+        else:
+            self.label_error.configure(text="El producto no se encuentra en la base de datos.")
+            self.entrada_codigo.delete(0, "end")
+            self.entrada_codigo.focus()
 
     def guardar_cambios(self):
         nuevo_nombre = self.entry_nombre.get().strip().capitalize()
@@ -145,19 +141,15 @@ class ModificarApp(ctk.CTkToplevel):
             except ValueError:
                 self.label_error.configure(text="El valor en precio no es válido.")
                 return
-
-        # 4. Si todo salió bien, guardamos el archivo completo y cerramos la ventana
-        db.save_file(self.inventario)
+            
         self.destroy()
 
 # --- VENTANA EMERGENTE PARA ELIMINAR PRODUCTO ---
 class EliminarAPP(ctk.CTkToplevel):
-    def __init__(self, parent, inventario):
+    def __init__(self, parent):
         super().__init__(parent)
         self.title("Eliminar producto")
         self.geometry("350x100")
-        self.inventario = inventario
-        self.inventario = db.load_file()
         self.producto_a_eliminar = None
 
         self.grab_set()
@@ -179,14 +171,11 @@ class EliminarAPP(ctk.CTkToplevel):
 
     def ventana_eliminar(self, event):
         codigo = self.entrada_codigo.get()
-        if not db.product_exist(self.inventario, codigo):
-            self.label_error.configure(text="El producto no se encuentra en la base de datos.")
-            self.entrada_codigo.delete(0, "end")
-            self.entrada_codigo.focus()
-        else:
+        self.producto_a_eliminar = db.get_product_by_code(codigo)
+
+        if self.producto_a_eliminar:
             self.label_error.configure(text="")
             self.geometry("350x250")
-            self.producto_a_eliminar = db.get_product_by_code(self.inventario, codigo)
 
             self.label_nombre_producto.configure(text=f"Nombre : {self.producto_a_eliminar.nombre}")
             self.label_nombre_producto.pack(pady = 1)
@@ -196,22 +185,22 @@ class EliminarAPP(ctk.CTkToplevel):
 
             self.boton_eliminar.pack(pady = 5)
             self.entrada_codigo.configure(state="disabled")
+        else:
+            self.label_error.configure(text="El producto no se encuentra en la base de datos.")
+            self.entrada_codigo.delete(0, "end")
+            self.entrada_codigo.focus()
 
     def eliminar_producto(self):
-        if self.producto_a_eliminar in self.inventario:
-            self.inventario.remove(self.producto_a_eliminar)
-            db.save_file(self.inventario)
-            
+        codigo = self.producto_a_eliminar.codigo
+        db.delete_product_db(codigo)
         self.destroy()
 
 # --- VENTANA EMERGENTE PARA MOSTRAR PRODUCTO ---
 class MostrarAPP(ctk.CTkToplevel):
-    def __init__(self, parent, inventario):
+    def __init__(self, parent):
         super().__init__(parent)
         self.title("Mostrar producto")
         self.geometry("350x150")
-        self.inventario = inventario
-        self.inventario = db.load_file()
         self.producto_a_mostrar = None
 
         self.grab_set()
@@ -232,12 +221,12 @@ class MostrarAPP(ctk.CTkToplevel):
 
     def ventana_mostrar(self, event):
         codigo = self.entrada_codigo.get()
-        if not db.product_exist(self.inventario, codigo):
+        if not db.product_exist(codigo):
             self.label_error.configure(text="El producto no se encuentra en la base de datos.")
             self.entrada_codigo.delete(0, "end")
             self.entrada_codigo.focus()
         else:
-            self.producto_a_mostrar = db.get_product_by_code(self.inventario, codigo)
+            self.producto_a_mostrar = db.get_product_by_code(codigo)
             self.label_error.configure(text="")
             self.geometry("350x225")
 
@@ -259,7 +248,6 @@ class AdminAPP(ctk.CTkToplevel):
         super().__init__(parent)
         self.title(" Baquiano - Administración")
         self.geometry("400x210")
-        self.inventario = db.load_file()
 
         self.label_bienvenida = ctk.CTkLabel(self, text="Administración de productos", font=("Arial",16), text_color="orange")
         self.label_bienvenida.pack(pady = 5)
@@ -278,16 +266,16 @@ class AdminAPP(ctk.CTkToplevel):
 
     def abrir_ventana_agregar(self):
         # Abrimos la ventana emergente pasándole el inventario actual
-        AgregarAPP(self, self.inventario)
+        AgregarAPP(self)
     
     def abrir_ventana_modificar(self):
-        ModificarApp(self,self.inventario)
+        ModificarApp(self)
 
     def abrir_ventana_eliminar(self):
-        EliminarAPP(self, self.inventario)
+        EliminarAPP(self)
 
     def abrir_ventana_mostrar(self):
-        MostrarAPP(self, self.inventario)
+        MostrarAPP(self)
 
 if __name__ == "__main__":
     app = AdminAPP()
