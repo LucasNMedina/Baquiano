@@ -54,10 +54,10 @@ class SalesAPP(ctk.CTkToplevel):
                 self.update_textbox("Fiambreria", manual_price)
                 self.entry_barcode.delete(0, "end")
             except ValueError:
-                self.lbl_error.configure(text="Debés ingresar un monto valido.")
+                self.lbl_error.configure(text="Debés ingresar un monto valido." text_color = "red")
                 self.entry_barcode.delete(0, "end")
         else:
-            self.lbl_error.configure(text="El producto no existe.")
+            self.lbl_error.configure(text="El producto no existe.", text_color = "red")
             self.entry_barcode.delete(0, "end")
 
     def end_sale(self):
