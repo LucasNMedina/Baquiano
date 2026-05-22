@@ -7,7 +7,7 @@ class AgregarAPP(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Nuevo Producto")
-        self.geometry("350x300")
+        self.geometry("350x310")
 
         # Esto hace que tenga que cerrar esta ventana antes de volver a tocar la principal
         self.grab_set()
@@ -33,7 +33,6 @@ class AgregarAPP(ctk.CTkToplevel):
         self.entrada_precio_producto = ctk.CTkEntry(self, placeholder_text="1500", width=300)
         self.entrada_precio_producto.pack(pady = 5)
 
-        
         self.label_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
         self.label_error.pack(pady = 5)
 
@@ -105,12 +104,12 @@ class ModificarApp(ctk.CTkToplevel):
             self.label_consulta.pack(pady = 2)
             
             #---Nombre---
-            self.label_nombre.configure(text=f"Nombre : {self.producto_a_modificar.nombre}")
+            self.label_nombre.configure(text=f"Nombre : {self.producto_a_modificar.name}")
             self.label_nombre.pack(pady = 5)
             self.entry_nombre.pack(pady = 1)
 
             #---Precio---
-            self.label_precio.configure(text=f"Precio : ${self.producto_a_modificar.precio}")
+            self.label_precio.configure(text=f"Precio : ${self.producto_a_modificar.price}")
             self.label_precio.pack(pady = 5)
             self.entry_precio.pack(pady = 1)
 
@@ -124,7 +123,7 @@ class ModificarApp(ctk.CTkToplevel):
 
     def finalizar_modificacion(self):
         # 1. Recuperamos el código del producto que se buscó
-        codigo = self.producto_a_modificar.codigo
+        codigo = self.producto_a_modificar.code
 
         # 2. Leemos los entry
         nuevo_nombre = self.entry_nombre.get().strip().capitalize()
@@ -137,7 +136,7 @@ class ModificarApp(ctk.CTkToplevel):
         
         # Si dejó el nombre vacío, se queda con el que ya tenía antes
         if not nuevo_nombre:
-            nuevo_nombre = self.producto_a_modificar.nombre
+            nuevo_nombre = self.producto_a_modificar.name
 
         # Si dejó el precio vacío, se queda con el de antes. Si escribió, lo validamos
         if nuevo_precio_texto:
@@ -147,7 +146,7 @@ class ModificarApp(ctk.CTkToplevel):
                 self.label_error.configure(text="El valor en precio no es válido.")
                 return
         else:
-            nuevo_precio = self.producto_a_modificar.precio
+            nuevo_precio = self.producto_a_modificar.price
 
         # 🛠️ ¡LA MAGIA NUEVA! Mandamos los datos limpios y finales a la base de datos
         exito = db.update_product_db(codigo, nuevo_nombre, nuevo_precio)
@@ -190,10 +189,10 @@ class EliminarAPP(ctk.CTkToplevel):
             self.label_error.configure(text="")
             self.geometry("350x250")
 
-            self.label_nombre_producto.configure(text=f"Nombre : {self.producto_a_eliminar.nombre}")
+            self.label_nombre_producto.configure(text=f"Nombre : {self.producto_a_eliminar.name}")
             self.label_nombre_producto.pack(pady = 1)
 
-            self.label_precio_producto.configure(text=f"Precio : {self.producto_a_eliminar.precio}")
+            self.label_precio_producto.configure(text=f"Precio : {self.producto_a_eliminar.price}")
             self.label_precio_producto.pack(pady = 1)
 
             self.boton_eliminar.pack(pady = 5)
@@ -204,7 +203,7 @@ class EliminarAPP(ctk.CTkToplevel):
             self.entrada_codigo.focus()
 
     def eliminar_producto(self):
-        codigo = self.producto_a_eliminar.codigo
+        codigo = self.producto_a_eliminar.code
         db.delete_product_db(codigo)
         self.destroy()
 
@@ -240,10 +239,10 @@ class MostrarAPP(ctk.CTkToplevel):
             self.label_error.configure(text="")
             self.geometry("350x225")
 
-            self.label_nombre_producto.configure(text=f"Nombre: {self.producto_a_mostrar.nombre}")
+            self.label_nombre_producto.configure(text=f"Nombre: {self.producto_a_mostrar.name}")
             self.label_nombre_producto.pack(pady = 2)
 
-            self.label_precio_producto.configure(text=f"Precio: {self.producto_a_mostrar.precio}")
+            self.label_precio_producto.configure(text=f"Precio: {self.producto_a_mostrar.price}")
             self.label_precio_producto.pack(pady = 2)
 
             self.boton_volver.pack(pady = 5)
