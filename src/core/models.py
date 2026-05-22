@@ -1,8 +1,8 @@
 class Producto:
-    def __init__(self, codigo, nombre, precio):
-        self.codigo = codigo
-        self.nombre = nombre
-        self.precio = precio
+    def __init__(self, code, name, price):
+        self.code = code
+        self.name = name
+        self.price = price
 
     #Lo convierto en diccionario para poder guardar el archivo JSON
     def to_dict(self):
@@ -13,4 +13,4 @@ class Producto:
         }
 
     def __str__(self):
-        return f"Codigo: {self.codigo}\nProducto: {self.nombre} - Precio: ${self.precio:.2f}"
+        return f"Codigo: {self.code}\nProducto: {self.name} - Precio: ${self.price:.2f}"

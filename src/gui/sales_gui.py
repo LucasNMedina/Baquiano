@@ -39,11 +39,11 @@ class SalesAPP(ctk.CTkToplevel):
         barcode = self.entry_barcode.get().strip()
         product = db.get_product_by_code(barcode)
 
-        if db.product_exist(barcode):
+        if product:
             self.lbl_error.configure(text="")
-            self.total_purchease += product.precio
+            self.total_purchease += product.price
             self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}")
-            self.actualizar_textbox(product.nombre, product.precio)
+            self.update_textbox(product.name, product.price)
             self.entry_barcode.delete(0, "end")
         elif barcode.startswith("+"):
             try:
@@ -51,7 +51,7 @@ class SalesAPP(ctk.CTkToplevel):
                 self.total_purchease += manual_price
                 
                 self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}")
-                self.actualizar_textbox("Fiambreria", manual_price)
+                self.update_textbox("Fiambreria", manual_price)
                 self.entry_barcode.delete(0, "end")
             except ValueError:
                 self.lbl_error.configure(text="Debés ingresar un monto valido.")
@@ -69,14 +69,14 @@ class SalesAPP(ctk.CTkToplevel):
         self.txtbox_product_list.configure(state="disabled") # Bloquear
 
         self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}")
-        self.lbl_error.configure(text="¡Muchas Gracias por comprar!")
+        self.lbl_error.configure(text="¡Muchas Gracias por comprar!", text_color = "green")
     
-    def actualizar_textbox(self, nombre, precio):
+    def update_textbox(self, name, price):
         # Configuramos "normal" para podes escribir
         self.txtbox_product_list.configure(state="normal")
 
         # Insertamos al final con "end"
-        self.txtbox_product_list.insert("end", f"{nombre} - ${precio:.2f}\n")
+        self.txtbox_product_list.insert("end", f"{name} - ${price:.2f}\n")
 
         #Se bloquea nuevamente
         self.txtbox_product_list.configure(state="disabled")
