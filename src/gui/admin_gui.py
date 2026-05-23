@@ -7,7 +7,7 @@ class AgregarAPP(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Nuevo Producto")
-        self.geometry("350x310")
+        self.geometry("350x340")
 
         # Esto hace que tenga que cerrar esta ventana antes de volver a tocar la principal
         self.grab_set()
@@ -33,12 +33,15 @@ class AgregarAPP(ctk.CTkToplevel):
         self.entry_product_price = ctk.CTkEntry(self, placeholder_text="1500", width=300)
         self.entry_product_price.pack(pady = 5)
 
-        self.lbl_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
-        self.lbl_error.pack(pady = 5)
+        self.lbl_result_info = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
+        self.lbl_result_info.pack(pady = 5)
 
         #Boton agregar
         self.btn_finish = ctk.CTkButton(self, text="Guardar producto", command=self.add_product)
         self.btn_finish.pack(pady = 5)
+
+        self.btn_back = ctk.CTkButton(self, text="Volver", command=self.back_to_menu)
+        self.btn_back.pack(pady = 2)
 
     def add_product(self):
             code = self.entry_barcode.get().strip()
@@ -47,20 +50,23 @@ class AgregarAPP(ctk.CTkToplevel):
 
             #No dejar vacios
             if not code or not name or not price_txt:
-                self.lbl_error.configure(text="Todos los campos son obligatorios.")
+                self.lbl_result_info.configure(text="Todos los campos son obligatorios.", text_color="red")
                 return
 
             try:
                  price = float(price_txt)
             except ValueError:
-                self.lbl_error.configure(text="El valor en precio no es valido.")
+                self.lbl_result_info.configure(text="El valor en precio no es valido.", text_color="red")
                 return
             
             exito = db.add_product_db(code, name, price)
             if exito:
-                self.destroy()
+                self.lbl_result_info.configure(text="Producto guardado correctamente.", text_color="green")
             else:
-                self.lbl_error.configure(text="El producto ya existe en el sistema.")
+                self.lbl_result_info.configure(text="El producto ya existe en el sistema.", text_color="red")
+
+    def back_to_menu(self):
+        self.destroy()
 
 # --- VENTANA EMERGENTE PARA MODIFICAR PRODUCTO ---
 class ModificarApp(ctk.CTkToplevel):
