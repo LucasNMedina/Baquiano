@@ -62,6 +62,11 @@ class AgregarAPP(ctk.CTkToplevel):
             exito = db.add_product_db(code, name, price)
             if exito:
                 self.lbl_result_info.configure(text="Producto guardado correctamente.", text_color="green")
+                self.entry_barcode.delete(0, "end")
+                self.entry_product_name.delete(0, "end")
+                self.entry_product_price.delete(0, "end")
+
+                self.entry_barcode.focus()
             else:
                 self.lbl_result_info.configure(text="El producto ya existe en el sistema.", text_color="red")
 

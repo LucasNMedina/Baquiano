@@ -32,7 +32,7 @@ class MenuPrincipal(ctk.CTk):
         self.withdraw()
         
         # 2. Abrimos la ventana de ventas
-        ventana_ventas = SalesAPP()
+        ventana_ventas = SalesAPP(self)
         
         # 3. Truco mágico: Cuando Florencia cierre ventas, el menú vuelve a aparecer
         ventana_ventas.protocol("WM_DELETE_WINDOW", lambda: self.volver_al_menu(ventana_ventas))
@@ -42,7 +42,7 @@ class MenuPrincipal(ctk.CTk):
         self.withdraw()
         
         # 2. Abrimos tu ventana de administración que testeamos recién
-        ventana_admin = AdminAPP()
+        ventana_admin = AdminAPP(self)
         
         # 3. Cuando cierre administración, el menú vuelve a aparecer
         ventana_admin.protocol("WM_DELETE_WINDOW", lambda: self.volver_al_menu(ventana_admin))

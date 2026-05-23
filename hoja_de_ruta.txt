@@ -1,4 +1,3 @@
 Cambios que debo hacer (sin prioridad)
 - cambiar en el src/consola_legacy/admin y src/consola_legacy/sales porque todavía siguen trabajando con JSON
 - al finalizar la venta, mostrar el total MAS CLARO
-- agregar boton VOLVER en agregar producto, asi es mas facil.

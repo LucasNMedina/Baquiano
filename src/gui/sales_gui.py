@@ -60,6 +60,7 @@ class SalesAPP(ctk.CTkToplevel):
             self.lbl_error.configure(text="El producto no existe.", text_color = "red")
             self.entry_barcode.delete(0, "end")
 
+        self.entry_barcode.focus()
     def end_sale(self):
         self.total_purchease = 0.0
 
