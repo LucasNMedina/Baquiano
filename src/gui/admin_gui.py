@@ -109,7 +109,6 @@ class ModificarApp(ctk.CTkToplevel):
         if self.product_to_modify:
             self.geometry("350x325")
             self.lbl_error.configure(text="")
-            self.lbl_error.pack()
 
             #hago aparecer los labels
             self.lbl_ask.pack(pady = 2)
