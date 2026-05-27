@@ -1,5 +1,6 @@
 import src.core.database as db
 import os
+import sys
 from pathlib import Path
 
 # --- BLINDAJE DE RUTA --- 
