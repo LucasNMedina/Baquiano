@@ -3,6 +3,16 @@ import os
 from src.core.models import Producto
 #DB_PATH = "data/baquiano.db"
 
+# 1. Averigua la ruta absoluta de la carpeta donde está este archivo (src/core/)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# 2. Sube un nivel para salir de 'src/core' y llegar a la raíz del proyecto
+PROYECTO_RAIZ = os.path.dirname(os.path.dirname(BASE_DIR))
+
+# 3. Construye la ruta final apuntando a la carpeta data/ en la raíz
+DB_PATH = os.path.join(PROYECTO_RAIZ, "data", "baquiano.db")
+
+"""
 # --- CONFIGURACIÓN DE RUTAS ABSOLUTAS (A prueba de fallos de OneDrive) ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -11,7 +21,7 @@ DB_PATH = os.path.join(DATA_DIR, "baquiano.db")
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
 # -------------------------------------------------------------------------
-
+"""
 
 def inicializar_db():
     """Crea la tabla de productos si no existe al arrancar el programa."""

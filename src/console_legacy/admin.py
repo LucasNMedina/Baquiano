@@ -1,12 +1,21 @@
 import src.core.database as db
 from src.core.models import Producto
+import sys
+from pathlib import Path
+
+# --- BLINDAJE DE RUTA --- 
+# Encuentra la raíz 'baquiano/' para que Python localice 'src' sin importar cómo se ejecute
+RAIZ_PROYECTO = str(Path(__file__).resolve().parent.parent.parent)
+if RAIZ_PROYECTO not in sys.path:
+    sys.path.append(RAIZ_PROYECTO) #python -m src.console_legacy.admin   
+
 #Funciones
 def menu(): #Muestra el menú
     print("---Sistema 'Baquiano'---")
     print("1.Agregar producto")
     print("2.Modificar producto")
     print("3.Eliminar producto")
-    print("4.Mostrar productos")
+    print("4.Mostrar producto")
     print("5.Salir")
 
 def get_menu_number(): #Obtiene un número y lo devuelve
@@ -33,37 +42,34 @@ def get_price(): #Obtiene un precio y lo devuelve
         except ValueError:
             print("El precio es incorrecto.")
 
-def get_product(inventory_list): #Obtiene los datos para el producto y lo devuelve creado
-    produc_codigo = input("Escaneá el código de barras: ")
 
-    if db.product_exist(inventory_list, produc_codigo):
-        print("El producto ya se encuentra agregado.")
-        return None
+def add_product():
+    product_barcode = input("Escaneá el código de barras del nuevo producto: ")
+    product_to_add = db.get_product_by_code(product_barcode)
 
-    produc_nombre = input("Colocá el nombre del producto: ").strip().capitalize()
-    produc_precio = get_price()
-
-    #Devuelvo el producto ya creado
-    return Producto(produc_codigo, produc_nombre, produc_precio)
-
-def add_product(inventory_list):
-    product = get_product(inventory_list)
-    if product:
-        inventory_list.append(product)
-        print(f"{product.name} agregado correctamente!")
-        db.save_file(inventory_list)
-
-def request_and_get_product_by_code(inventory_list): #Busca un producto en la lista 
-    code = input("Escaneá el codigo del producto: ")
-    return db.get_product_by_code(inventory_list, code)
-
-def remove_product(inventory_list): #Elimina un producto de la lista
-    p = request_and_get_product_by_code(inventory_list)
-    if p is None:
-        print("Producto no encontrado.")
+    if product_to_add:
+        print("El producto ya se encuentra en la base de datos.")
     else:
-        inventory_list.remove(p)
-        print(f"Producto '{p.name}' eliminado exitosamente.")
+        product_name = input("Ingresa el nombre del producto: ").strip().capitalize()
+        product_price = get_price()
+
+        db.add_product_db(product_barcode, product_name, product_price)
+        print("Producto agregado correctamente.")
+
+def remove_product(): #Elimina un producto de la lista
+    barcode = input("Escaneá el producto que queres borrar: ")
+    product_to_eliminate = db.get_product_by_code(barcode)
+
+    if product_to_eliminate is None:
+        print("El producto no se encuentra en la base de datos.")
+    else:
+        print(f"Producto: {product_to_eliminate.name} - Precio: ${product_to_eliminate.price}")
+        confirmate = input("Desea eliminar S/N: ").strip().lower()
+        if confirmate == "s":
+            db.delete_product_db(product_to_eliminate.code)
+            print("Producto eliminado correctamente.")
+        else:
+            print("Volviendo al menú")
 
 def modification_menu(product):
     print()
@@ -76,35 +82,39 @@ def modification_menu(product):
 
 def modification_name(product):
     new_name = input("Ingrese el nuevo nombre del producto: ").strip().capitalize()
-    product.name = new_name
-    print("El producto se modifico correctamente.")
+    db.update_product_db(product.code, new_name, product.price)
+    print("El nombre del producto se modifico correctamente.")
 
 def modification_price(product):
     new_price = get_price()
-    product.price = new_price
-    print("El producto se modifico correctamente.")
+    db.update_product_db(product.code, product.name, new_price)
+    print("El precio del producto se modifico correctamente.")
 
-def modify_product(inventory_list):
-    p = request_and_get_product_by_code(inventory_list)
-    if p is None:
+def modify_product():
+    barcode = input("Escaneá el código del producto a modificar: ")
+    product_to_modify = db.get_product_by_code(barcode)
+
+    if product_to_modify is None:
         print("Producto no encontrado.")
     else:
-        modification_menu(p)
+        modification_menu(product_to_modify)
         rta = validate_menu(1,3)
         match rta:
             case 1:
-                modification_name(p)
+                modification_name(product_to_modify)
             case 2:
-                modification_price(p)
+                modification_price(product_to_modify)
             case 3:
                 print("Volviendo al menú principal")
 
-def show_products(inventory_list): #Muestra los productos en la lista
-    if not inventory_list:
-        print("No hay productos para mostrar.")
+def show_product(): #Muestra los productos en la lista
+    barcode = input("Escaneá el código de barras: ")
+    product_to_show = db.get_product_by_code(barcode)
+
+    if product_to_show is None:
+        print("El producto no se encuentra en la base de datos.")
     else:
-        for p in inventory_list:
-            print(p)
+        print(product_to_show)
 
 #Fin funciones
 while True:
@@ -119,7 +129,7 @@ while True:
         case 3:
             remove_product()
         case 4:
-            show_products()
+            show_product()
         case 5:
             print("Saliendo del programa.")
             break
