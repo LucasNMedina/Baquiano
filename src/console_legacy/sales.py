@@ -1,5 +1,13 @@
 import src.core.database as db
 import os
+from pathlib import Path
+
+# --- BLINDAJE DE RUTA --- 
+# Encuentra la raíz 'baquiano/' para que Python localice 'src' sin importar cómo se ejecute
+RAIZ_PROYECTO = str(Path(__file__).resolve().parent.parent.parent)
+if RAIZ_PROYECTO not in sys.path:
+    sys.path.append(RAIZ_PROYECTO)
+#ESTO TODAVIA NO LO ENTIENDO !!!!!!
 
 while True:
     os.system("cls") #Limpio pantalla para cada venta
