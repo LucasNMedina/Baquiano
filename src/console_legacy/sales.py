@@ -1,7 +1,6 @@
-import database as db
+import src.core.database as db
 import os
 
-inventario = db.load_file()
 while True:
     os.system("cls") #Limpio pantalla para cada venta
     total_cuenta = 0
@@ -23,10 +22,10 @@ while True:
                 print(f"   SUBTOTAL: ${total_cuenta:.2f}")
             except ValueError:
                 print("Error: Después del '+' debes colocar un número válido.")
-        elif db.product_exist(inventario, codigo_producto):
-            producto = db.get_product_by_code(inventario, codigo_producto)
-            print(f"Producto: {producto.nombre} - Precio: ${producto.precio}")
-            total_cuenta += producto.precio
+        elif db.product_exist(codigo_producto):
+            producto = db.get_product_by_code(codigo_producto)
+            print(f"Producto: {producto.name} - Precio: ${producto.price}")
+            total_cuenta += producto.price
             print(f"   SUBTOTAL: ${total_cuenta}")
         else:
             print("Producto no encontrado.")

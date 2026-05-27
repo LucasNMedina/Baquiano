@@ -1,10 +1,8 @@
 import sqlite3
 import os
 from src.core.models import Producto
+#DB_PATH = "data/baquiano.db"
 
-DB_PATH = "data/baquiano.db"
-
-"""
 # --- CONFIGURACIÓN DE RUTAS ABSOLUTAS (A prueba de fallos de OneDrive) ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -13,7 +11,7 @@ DB_PATH = os.path.join(DATA_DIR, "baquiano.db")
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
 # -------------------------------------------------------------------------
-"""
+
 
 def inicializar_db():
     """Crea la tabla de productos si no existe al arrancar el programa."""

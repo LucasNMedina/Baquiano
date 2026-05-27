@@ -1,5 +1,5 @@
-import database as db
-from models import Producto
+import src.core.database as db
+from src.core.models import Producto
 #Funciones
 def menu(): #Muestra el menú
     print("---Sistema 'Baquiano'---")
@@ -50,7 +50,7 @@ def add_product(inventory_list):
     product = get_product(inventory_list)
     if product:
         inventory_list.append(product)
-        print(f"{product.nombre} agregado correctamente!")
+        print(f"{product.name} agregado correctamente!")
         db.save_file(inventory_list)
 
 def request_and_get_product_by_code(inventory_list): #Busca un producto en la lista 
@@ -63,8 +63,7 @@ def remove_product(inventory_list): #Elimina un producto de la lista
         print("Producto no encontrado.")
     else:
         inventory_list.remove(p)
-        print(f"Producto '{p.nombre}' eliminado exitosamente.")
-    db.save_file(inventory_list)
+        print(f"Producto '{p.name}' eliminado exitosamente.")
 
 def modification_menu(product):
     print()
@@ -77,12 +76,12 @@ def modification_menu(product):
 
 def modification_name(product):
     new_name = input("Ingrese el nuevo nombre del producto: ").strip().capitalize()
-    product.nombre = new_name
+    product.name = new_name
     print("El producto se modifico correctamente.")
 
 def modification_price(product):
     new_price = get_price()
-    product.precio = new_price
+    product.price = new_price
     print("El producto se modifico correctamente.")
 
 def modify_product(inventory_list):
@@ -95,10 +94,8 @@ def modify_product(inventory_list):
         match rta:
             case 1:
                 modification_name(p)
-                db.save_file(inventory_list)
             case 2:
                 modification_price(p)
-                db.save_file(inventory_list)
             case 3:
                 print("Volviendo al menú principal")
 
@@ -110,23 +107,21 @@ def show_products(inventory_list): #Muestra los productos en la lista
             print(p)
 
 #Fin funciones
-inventario = db.load_file()
 while True:
     menu()
     rta = validate_menu(1,5)
 
     match rta:
         case 1:
-            add_product(inventario)
+            add_product()
         case 2:
-            modify_product(inventario)
+            modify_product()
         case 3:
-            remove_product(inventario)
+            remove_product()
         case 4:
-            show_products(inventario)
+            show_products()
         case 5:
             print("Saliendo del programa.")
-            db.save_file(inventario)
             break
         case _: # El guion bajo es el "comodín" (opción por defecto)
             print("Opción inválida.")
