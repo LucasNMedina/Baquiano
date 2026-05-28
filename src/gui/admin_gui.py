@@ -171,10 +171,10 @@ class EliminarAPP(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Eliminar producto")
-        self.geometry("350x100")
-        self.product_to_eliminate = None
-
+        self.geometry("350x250")
         self.grab_set()
+
+        self.product_to_eliminate = None
 
         self.lbl_modify = ctk.CTkLabel(self, text="Escaneá el producto que queres eliminar", font=("Arial",12))
         self.lbl_modify.pack(pady = 5)
@@ -186,46 +186,54 @@ class EliminarAPP(ctk.CTkToplevel):
         self.lbl_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
         self.lbl_error.pack(pady = 5)
 
-        self.lbl_product_name = ctk.CTkLabel(self, text="", font=("Arial", 12))
-        self.lbl_product_price = ctk.CTkLabel(self, text="", font=("Arial", 12))
+        self.frame_confirm_elimination = ctk.CTkFrame(self, fg_color="transparent")
 
-        self.btn_eliminate = ctk.CTkButton(self, text="Eliminar", command=self.eliminar_producto)
+        self.lbl_product_name = ctk.CTkLabel(self.frame_confirm_elimination, text="", font=("Arial", 12, "bold"))
+        self.lbl_product_price = ctk.CTkLabel(self.frame_confirm_elimination, text="", font=("Arial", 12, "bold"))
+        self.btn_eliminate = ctk.CTkButton(self.frame_confirm_elimination, text="Eliminar", command=self.eliminar_producto)
 
+        self.lbl_product_name.pack(pady = 1)
+        self.lbl_product_price.pack(pady = 1)
+        self.btn_eliminate.pack(pady = 5)
+
+        self.btn_back = ctk.CTkButton(self, text="Volver", command=self.volver_atras)
+        self.btn_back.pack(pady = 15, side="bottom")
+        
     def ventana_eliminar(self, event):
         barcode = self.entry_barcode.get()
         self.product_to_eliminate = db.get_product_by_code(barcode)
 
         if self.product_to_eliminate:
             self.lbl_error.configure(text="")
-            self.geometry("350x250")
 
             self.lbl_product_name.configure(text=f"Nombre : {self.product_to_eliminate.name}")
-            self.lbl_product_name.pack(pady = 1)
-
             self.lbl_product_price.configure(text=f"Precio : {self.product_to_eliminate.price}")
-            self.lbl_product_price.pack(pady = 1)
-
-            self.btn_eliminate.pack(pady = 5)
-            self.entry_barcode.configure(state="disabled")
+        
+            self.frame_confirm_elimination.pack(pady = 5, fill="x")
         else:
             self.lbl_error.configure(text="El producto no se encuentra en la base de datos.")
-            self.entry_barcode.delete(0, "end")
-            self.entry_barcode.focus()
+            self.frame_confirm_elimination.pack_forget()
+        self.entry_barcode.delete(0, "end")
+        self.entry_barcode.focus()    
 
     def eliminar_producto(self):
         barcode = self.product_to_eliminate.code
         db.delete_product_db(barcode)
         self.destroy()
 
+    def volver_atras(self):
+        self.destroy()
+
 # --- VENTANA EMERGENTE PARA MOSTRAR PRODUCTO ---
 class MostrarAPP(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
+        #--- CONFIGURO LA VENTANA --- 
         self.title("Mostrar producto")
-        self.geometry("350x150")
-        self.product_to_show = None
-
+        self.geometry("350x250")
+        self.resizable(False, False)
         self.grab_set()
+        self.product_to_show = None
 
         self.lbl_modify = ctk.CTkLabel(self, text="Escaneá el producto que queres mostrar", font=("Arial",12))
         self.lbl_modify.pack(pady = 5)
@@ -237,31 +245,37 @@ class MostrarAPP(ctk.CTkToplevel):
         self.lbl_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
         self.lbl_error.pack(pady = 5)
         
-        self.lbl_product_name = ctk.CTkLabel(self, text="", font=("Arial", 12))
-        self.lbl_product_price = ctk.CTkLabel(self, text="", font=("Arial", 12))
-        self.btn_back = ctk.CTkButton(self, text="Volver", command=self.volver_atras)
+        #LA "CAJA INVISIBLE" (Frame) para los datos del producto.
+        self.frame_data = ctk.CTkFrame(self, fg_color="transparent")
 
+        self.lbl_product_name = ctk.CTkLabel(self.frame_data, text="", font=("Arial", 12, "bold"))
+        self.lbl_product_price = ctk.CTkLabel(self.frame_data, text="", font=("Arial", 12, "bold"))
+
+        self.lbl_product_name.pack(pady = 2)
+        self.lbl_product_price.pack(pady = 2)
+
+        # 1. EL CAMBIO CLAVE: El botón nace apuntando a la ventana (self)
+        self.btn_back = ctk.CTkButton(self, text="Volver", command=self.volver_atras)
+        # 2. Se empaqueta ACÁ MISMO fijándose abajo de todo. Ya no se mueve más.
+        self.btn_back.pack(pady = 15, side="bottom")
     def ventana_mostrar(self, event):
         barcode = self.entry_barcode.get()
         self.product_to_show = db.get_product_by_code(barcode)
 
         if self.product_to_show:
             self.lbl_error.configure(text="")
-            self.geometry("350x225")
 
             self.lbl_product_name.configure(text=f"Nombre: {self.product_to_show.name}")
-            self.lbl_product_name.pack(pady = 2)
-
             self.lbl_product_price.configure(text=f"Precio: {self.product_to_show.price}")
-            self.lbl_product_price.pack(pady = 2)
 
-            self.btn_back.pack(pady = 5)
-            self.entry_barcode.configure(state="disabled")
+            # El .pack() acá hace aparecer la caja con todo lo que tiene adentro
+            self.frame_data.pack(pady=5, fill="x")
         else:
+            # Si NO existe: ESCONDEMOS la caja con .pack_forget() y mostramos error
+            self.frame_data.pack_forget()
             self.lbl_error.configure(text="El producto no se encuentra en la base de datos.")
-            self.entry_barcode.delete(0, "end")
-            self.entry_barcode.focus()
-
+        self.entry_barcode.delete(0, "end")
+        self.entry_barcode.focus()
     def volver_atras(self):
         self.destroy()
 
