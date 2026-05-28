@@ -1,3 +1,2 @@
 Cambios que debo hacer (sin prioridad)
-- cambiar en el src/consola_legacy/admin porque todavía siguen trabajando con JSON
 - al finalizar la venta, mostrar el total MAS CLARO
