@@ -78,58 +78,63 @@ class ModificarApp(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Modificar producto")
-        self.geometry("350x100")
-        self.product_to_modify = None
-
+        self.geometry("350x360")
         self.grab_set()
 
-        self.lbl_modify = ctk.CTkLabel(self, text="Escaneá el producto que queres modificar", font=("Arial",12))
+        self.product_to_modify = None
+
+        self.lbl_modify = ctk.CTkLabel(self, text="Escaneá el producto que queres modificar", font=("Arial",12, "bold"))
         self.lbl_modify.pack(pady = 5)
 
-        self.entry_barcode = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300)
+        self.entry_barcode = ctk.CTkEntry(self, width=300)
         self.entry_barcode.pack(pady = 5)
         self.entry_barcode.bind("<Return>", self.modificar_producto)
 
         self.lbl_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
         self.lbl_error.pack(pady = 5)
 
+        self.frame_modify = ctk.CTkFrame(self, fg_color="transparent")
+
         #Solo creo los labels pero todavia no lo muestro
-        self.lbl_ask = ctk.CTkLabel(self, text="¿Qué deseas modificar del producto? ", font=("Arial", 12))
-        self.lbl_name = ctk.CTkLabel(self, text="", font=("Arial", 12))
-        self.entry_name = ctk.CTkEntry(self, placeholder_text="Nuevo nombre", width=200, height=15)
-        self.lbl_price = ctk.CTkLabel(self, text="", font=("Arial", 12))
-        self.entry_price = ctk.CTkEntry(self, placeholder_text="Nuevo precio", width=200, height=15)
+        self.lbl_ask = ctk.CTkLabel(self.frame_modify, text="¿Qué deseas modificar del producto? ", font=("Arial", 12))
+        self.lbl_name = ctk.CTkLabel(self.frame_modify, text="", font=("Arial", 12))
+        self.entry_name = ctk.CTkEntry(self.frame_modify, width=200)
+        self.lbl_price = ctk.CTkLabel(self.frame_modify, text="", font=("Arial", 12))
+        self.entry_price = ctk.CTkEntry(self.frame_modify, width=200)
     
-        self.btn_finish = ctk.CTkButton(self, text="Guardar producto", command=self.finalizar_modificacion)
+        self.btn_save_product = ctk.CTkButton(self.frame_modify, text="Guardar producto", command=self.finalizar_modificacion)
     
+        #hago aparecer los labels
+        self.lbl_ask.pack(pady = 2)          
+        self.lbl_name.pack(pady = 5)
+        self.entry_name.pack(pady = 1)
+        self.lbl_price.pack(pady = 5)
+        self.entry_price.pack(pady = 1)
+        self.btn_save_product.pack(pady = 5)
+
+        self.btn_back = ctk.CTkButton(self, text="Volver", command=self.volver_atras)
+        self.btn_back.pack(pady = 2, side="bottom")
+
+
     def modificar_producto(self, event):
         barcode = self.entry_barcode.get()
         self.product_to_modify = db.get_product_by_code(barcode)
 
         if self.product_to_modify:
-            self.geometry("350x325")
             self.lbl_error.configure(text="")
-
-            #hago aparecer los labels
-            self.lbl_ask.pack(pady = 2)
-            
-            #---Nombre---
             self.lbl_name.configure(text=f"Nombre : {self.product_to_modify.name}")
-            self.lbl_name.pack(pady = 5)
-            self.entry_name.pack(pady = 1)
-
-            #---Precio---
             self.lbl_price.configure(text=f"Precio : ${self.product_to_modify.price}")
-            self.lbl_price.pack(pady = 5)
-            self.entry_price.pack(pady = 1)
 
-            #--Boton--
-            self.btn_finish.pack(pady = 10)
-            self.entry_barcode.configure(state="disabled")
+            self.entry_name.delete(0, "end")
+            self.entry_price.delete(0, "end")
+
+            self.frame_modify.pack(pady = 5, fill="x")
         else:
-            self.lbl_error.configure(text="El producto no se encuentra en la base de datos.")
-            self.entry_barcode.delete(0, "end")
-            self.entry_barcode.focus()
+            self.lbl_error.configure(text="El producto no se encuentra en la base de datos.", text_color="red")
+            self.frame_modify.pack_forget()
+
+        self.entry_barcode.delete(0, "end")
+        self.entry_barcode.focus()
 
     def finalizar_modificacion(self):
         # 1. Recuperamos el código del producto que se buscó
@@ -158,20 +163,23 @@ class ModificarApp(ctk.CTkToplevel):
         else:
             new_price = self.product_to_modify.price
 
-        # 🛠️ ¡LA MAGIA NUEVA! Mandamos los datos limpios y finales a la base de datos
-        exito = db.update_product_db(barcode, new_name, new_price)
-        
-        if exito:
-            self.destroy()
+        if db.update_product_db(barcode, new_name, new_price):
+            self.frame_modify.pack_forget()
+            self.entry_name.delete(0, "end")
+            self.entry_price.delete(0, "end")
+            self.lbl_error.configure(text="Producto actualizado correctamente.", text_color="green")
+            self.entry_barcode.focus()
         else:
-            self.lbl_error.configure(text="Error al guardar en la base de datos.")
+            self.lbl_error.configure(text="Error al guardar en la base de datos.", text_color="red")
 
+    def volver_atras(self):
+        self.destroy()
 # --- VENTANA EMERGENTE PARA ELIMINAR PRODUCTO ---
 class EliminarAPP(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Eliminar producto")
-        self.geometry("350x250")
+        self.geometry("350x285")
         self.grab_set()
 
         self.product_to_eliminate = None
@@ -211,7 +219,7 @@ class EliminarAPP(ctk.CTkToplevel):
         
             self.frame_confirm_elimination.pack(pady = 5, fill="x")
         else:
-            self.lbl_error.configure(text="El producto no se encuentra en la base de datos.")
+            self.lbl_error.configure(text="El producto no se encuentra en la base de datos.", text_color="red")
             self.frame_confirm_elimination.pack_forget()
         self.entry_barcode.delete(0, "end")
         self.entry_barcode.focus()    
@@ -224,6 +232,7 @@ class EliminarAPP(ctk.CTkToplevel):
             self.entry_barcode.focus()
         else:
             self.lbl_error.configure(text="Error al intentar eliminar de la base de datos.", text_color="red")
+    
     def volver_atras(self):
         self.destroy()
 
@@ -279,6 +288,7 @@ class MostrarAPP(ctk.CTkToplevel):
             self.lbl_error.configure(text="El producto no se encuentra en la base de datos.")
         self.entry_barcode.delete(0, "end")
         self.entry_barcode.focus()
+    
     def volver_atras(self):
         self.destroy()
 
