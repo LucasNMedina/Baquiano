@@ -218,9 +218,12 @@ class EliminarAPP(ctk.CTkToplevel):
 
     def eliminar_producto(self):
         barcode = self.product_to_eliminate.code
-        db.delete_product_db(barcode)
-        self.destroy()
-
+        if db.delete_product_db(barcode):
+            self.frame_confirm_elimination.pack_forget()
+            self.lbl_error.configure(text="Producto eliminado correctamente.", text_color="green")
+            self.entry_barcode.focus()
+        else:
+            self.lbl_error.configure(text="Error al intentar eliminar de la base de datos.", text_color="red")
     def volver_atras(self):
         self.destroy()
 
