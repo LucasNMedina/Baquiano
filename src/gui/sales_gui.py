@@ -4,9 +4,10 @@ import src.core.database as db
 class SalesAPP(ctk.CTkToplevel):
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent)
-        self.grab_set()
         self.title("Baquiano - Ventas")
         self.geometry("500x550")
+        self.grab_set()
+
         self.total_purchease = 0.0
         
         #Label código de barras
@@ -14,26 +15,24 @@ class SalesAPP(ctk.CTkToplevel):
         self.lbl_entry_barcode.pack(pady = 5)
 
         #Lector código de barras
-        self.entry_barcode = ctk.CTkEntry(self, placeholder_text="Ej: 0123456748910", width=300)
+        self.entry_barcode = ctk.CTkEntry(self, width=300)
         self.entry_barcode.pack(pady = 5)
         self.entry_barcode.bind("<Return>", self.sell_product)
 
-        #Label de total
-        self.lbl_total = ctk.CTkLabel(self, text=f"Total: ${self.total_purchease:.2f}", text_color="orange", font=("Arial", 25))
-        self.lbl_total.pack(pady = 5)
+        self.btn_end_sale = ctk.CTkButton(self, text="Terminar Venta", command=self.end_sale, font=("Arial", 14, "bold"))
+        self.btn_end_sale.pack(pady = 10, side="bottom")
 
-        #Label muestra error
         self.lbl_error = ctk.CTkLabel(self, text="")
-        self.lbl_error.pack(pady = 5)
+        self.lbl_error.pack(pady = 5, side="bottom")
 
-        #TextBox de productos
+        self.lbl_total = ctk.CTkLabel(self, text=f"Total: ${self.total_purchease:.2f}", text_color="orange", font=("Arial", 25, "bold"))
+        self.lbl_total.pack(pady = 10, side="bottom")
+
         self.txtbox_product_list = ctk.CTkTextbox(self, width=450, height=300, font=("Arial", 20))
-        self.txtbox_product_list.pack(pady = 5)
         self.txtbox_product_list.configure(state="disabled")
+        self.txtbox_product_list.pack(pady = 5, fill="both", expand=True)
 
-        #Botón de finalizar
-        self.btn_finish = ctk.CTkButton(self, text="Finalizar venta", command=self.end_sale)
-        self.btn_finish.pack(pady = 15)
+        self.entry_barcode.focus()
 
     def sell_product(self, event):
         barcode = self.entry_barcode.get().strip()
@@ -45,11 +44,12 @@ class SalesAPP(ctk.CTkToplevel):
             self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}")
             self.update_textbox(product.name, product.price)
             self.entry_barcode.delete(0, "end")
-        elif barcode.startswith("+"):
+        elif barcode.startswith("."):
             try:
                 manual_price = float(barcode[1:])
                 self.total_purchease += manual_price
                 
+                self.lbl_error.configure(text="")
                 self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}")
                 self.update_textbox("Fiambreria", manual_price)
                 self.entry_barcode.delete(0, "end")
@@ -71,6 +71,9 @@ class SalesAPP(ctk.CTkToplevel):
 
         self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}")
         self.lbl_error.configure(text="¡Muchas Gracias por comprar!", text_color = "green")
+
+        self.entry_barcode.delete(0, "end")
+        self.entry_barcode.focus()
     
     def update_textbox(self, name, price):
         # Configuramos "normal" para podes escribir
