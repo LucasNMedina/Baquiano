@@ -1,4 +1,18 @@
+Plaintext
+# Entornos virtuales
+.venv/
+venv/
+ENV/
+
+# Archivos temporales y de compilación de Python
 __pycache__/
 *.pyc
-.venv/
-.vscode/
+
+# Carpetas generadas por PyInstaller (Compilación)
+build/
+dist/
+*.spec
+
+# Base de datos local (Datos del negocio)
+*.db
+*.sqlite3
