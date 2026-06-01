@@ -53,7 +53,7 @@ def add_product():
         product_name = input("Ingresa el nombre del producto: ").strip().capitalize()
         product_price = get_price()
 
-        db.add_product_db(product_barcode, product_name, product_price)
+        db.insert_product_db(product_barcode, product_name, product_price)
         print("Producto agregado correctamente.")
 
 def remove_product(): #Elimina un producto de la lista

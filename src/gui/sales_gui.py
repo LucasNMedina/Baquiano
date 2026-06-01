@@ -32,8 +32,8 @@ class SalesAPP(ctk.CTkToplevel):
         self.txtbox_product_list.configure(state="disabled")
         self.txtbox_product_list.pack(pady = 5, fill="both", expand=True)
 
-        self.entry_barcode.focus()
-
+        self.after(100, self.entry_barcode.focus) #Esto es para darle tiempo a cargue todo los componentes
+        self.btn_end_sale.bind("<Return>", lambda event: self.end_sale())
     def sell_product(self, event):
         barcode = self.entry_barcode.get().strip()
         product = db.get_product_by_code(barcode)
@@ -61,20 +61,35 @@ class SalesAPP(ctk.CTkToplevel):
             self.entry_barcode.delete(0, "end")
 
         self.entry_barcode.focus()
+
     def end_sale(self):
-        self.total_purchease = 0.0
+        if self.btn_end_sale.cget("text") == "Terminar Venta":
+            if self.total_purchease == 0:
+                self.lbl_error.configure(text="No hay productos en la venta actual.", text_color="red")
+                return
+            
+            self.entry_barcode.configure(state="disabled")
+            self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}", text_color="green")
+            self.lbl_error.configure(text="Venta registrada. Presioná para continuar.", text_color="green")
+            self.btn_end_sale.configure(text="Nueva Venta")
+        
+        else:
+            self.total_purchease = 0.0
+            self.entry_barcode.configure(state="normal")
+            
+            self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}", text_color="orange")
+            self.lbl_error.configure(text="")
 
-        # Limpiar el Textbox:
-        self.txtbox_product_list.configure(state="normal") # Habilitar
-        self.txtbox_product_list.delete("1.0", "end")      # Borrar desde la línea 1, carácter 0 hasta el final 
-        self.txtbox_product_list.configure(state="disabled") # Bloquear
+            #TextBox
+            self.txtbox_product_list.configure(state="normal") # Habilitar
+            self.txtbox_product_list.delete("1.0", "end")      # Borrar desde la línea 1, carácter 0 hasta el final 
+            self.txtbox_product_list.configure(state="disabled") # Bloquear
 
-        self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}")
-        self.lbl_error.configure(text="¡Muchas Gracias por comprar!", text_color = "green")
+            self.btn_end_sale.configure(text="Terminar Venta")
 
-        self.entry_barcode.delete(0, "end")
-        self.entry_barcode.focus()
-    
+            self.entry_barcode.delete(0, "end")
+            self.entry_barcode.focus()
+
     def update_textbox(self, name, price):
         # Configuramos "normal" para podes escribir
         self.txtbox_product_list.configure(state="normal")

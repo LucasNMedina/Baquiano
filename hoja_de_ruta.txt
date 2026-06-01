@@ -1,2 +1,1 @@
 Cambios que debo hacer (sin prioridad)
-- al finalizar la venta, mostrar el total MAS CLARO

@@ -43,6 +43,7 @@ class AgregarAPP(ctk.CTkToplevel):
         self.btn_back = ctk.CTkButton(self, text="Volver", command=self.back_to_menu)
         self.btn_back.pack(pady = 2)
 
+        self.after(100, self.entry_barcode.focus)
     def add_product(self):
             code = self.entry_barcode.get().strip()
             name = self.entry_product_name.get().strip().capitalize()
@@ -59,7 +60,7 @@ class AgregarAPP(ctk.CTkToplevel):
                 self.lbl_result_info.configure(text="El valor en precio no es valido.", text_color="red")
                 return
             
-            exito = db.add_product_db(code, name, price)
+            exito = db.insert_product_db(code, name, price)
             if exito:
                 self.lbl_result_info.configure(text="Producto guardado correctamente.", text_color="green")
                 self.entry_barcode.delete(0, "end")
@@ -115,9 +116,9 @@ class ModificarApp(ctk.CTkToplevel):
         self.btn_back = ctk.CTkButton(self, text="Volver", command=self.volver_atras)
         self.btn_back.pack(pady = 2, side="bottom")
 
-
+        self.after(100, self.entry_barcode.focus)
     def modificar_producto(self, event):
-        barcode = self.entry_barcode.get()
+        barcode = self.entry_barcode.get().strip()
         self.product_to_modify = db.get_product_by_code(barcode)
 
         if self.product_to_modify:
@@ -137,6 +138,10 @@ class ModificarApp(ctk.CTkToplevel):
         self.entry_barcode.focus()
 
     def finalizar_modificacion(self):
+        if not self.product_to_modify:
+            self.lbl_error.configure(text="Primero debes escanear un producto válido.", text_color="red")
+            return
+        
         # 1. Recuperamos el código del producto que se buscó
         barcode = self.product_to_modify.code
 
@@ -207,6 +212,7 @@ class EliminarAPP(ctk.CTkToplevel):
         self.btn_back = ctk.CTkButton(self, text="Volver", command=self.volver_atras)
         self.btn_back.pack(pady = 15, side="bottom")
         
+        self.after(100, self.entry_barcode.focus)
     def ventana_eliminar(self, event):
         barcode = self.entry_barcode.get()
         self.product_to_eliminate = db.get_product_by_code(barcode)
@@ -270,6 +276,8 @@ class MostrarAPP(ctk.CTkToplevel):
         self.btn_back = ctk.CTkButton(self, text="Volver", command=self.volver_atras)
         # 2. Se empaqueta ACÁ MISMO fijándose abajo de todo. Ya no se mueve más.
         self.btn_back.pack(pady = 15, side="bottom")
+
+        self.after(100, self.entry_barcode.focus)
     def ventana_mostrar(self, event):
         barcode = self.entry_barcode.get()
         self.product_to_show = db.get_product_by_code(barcode)

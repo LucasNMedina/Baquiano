@@ -39,7 +39,7 @@ def inicializar_db():
     except sqlite3.Error as e:
         logging.critical(f"Error crítico al inicializar la base de datos: {e}")
 
-def add_product_db(code, name, price):
+def insert_product_db(code, name, price):
         try:
             with sqlite3.connect(DB_PATH) as conexion:
                 cursor = conexion.cursor()
