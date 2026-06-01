@@ -39,7 +39,11 @@ def inicializar_db():
     except sqlite3.Error as e:
         logging.critical(f"Error crítico al inicializar la base de datos: {e}")
 
-def insert_product_db(code, name, price):
+def insert_product_db(code, name, price): 
+        if price <= 0:
+            logging.error(f"Intento de insertar producto con precio inválido ({price}).")
+            return False
+        
         try:
             with sqlite3.connect(DB_PATH) as conexion:
                 cursor = conexion.cursor()
@@ -86,6 +90,10 @@ def delete_product_db(code):
 
 def update_product_db(code, new_name, new_price):
     """Actualiza el nombre y el precio de un producto usando su código."""
+    if new_price <= 0:
+        logging.error(f"Intento de actualizar producto con precio inválido ({new_price}).")
+        return False
+
     try:
         with sqlite3.connect(DB_PATH) as conexion:
             cursor = conexion.cursor()

@@ -57,6 +57,17 @@ class TestDataBase(unittest.TestCase):
         # Tu función database.py debe retornar None si no lo encuentra
         self.assertIsNone(producto_fantasma)
 
+    # 6. TEST 4: Verifica que el sistema RECHACE precios negativos o cero
+    def test_precio_negativo_devuelve_false(self):
+        # Intentamos insertar un precio inválido
+        resultado = insert_product_db("999999", "Yerba Maldita", -50.00)
+        
+        # Nuestra hipótesis es que DEBE devolver False (no se debe guardar)
+        self.assertFalse(resultado)
+        
+        # Comprobamos que efectivamente NO se haya guardado en la DB
+        producto = get_product_by_code("999999")
+        self.assertIsNone(producto)
 # Este bloque permite ejecutar el script directamente desde la consola
 if __name__ == "__main__":
     unittest.main()

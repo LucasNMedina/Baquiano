@@ -55,7 +55,10 @@ class AgregarAPP(ctk.CTkToplevel):
                 return
 
             try:
-                 price = float(price_txt)
+                price = float(price_txt)
+                if price <= 0:
+                    self.lbl_result_info.configure(text="El precio debe ser un número mayor a 0.", text_color="red")
+                    return
             except ValueError:
                 self.lbl_result_info.configure(text="El valor en precio no es valido.", text_color="red")
                 return
@@ -89,7 +92,7 @@ class ModificarApp(ctk.CTkToplevel):
 
         self.entry_barcode = ctk.CTkEntry(self, width=300)
         self.entry_barcode.pack(pady = 5)
-        self.entry_barcode.bind("<Return>", self.modificar_producto)
+        self.entry_barcode.bind("<Return>", self.modify_product)
 
         self.lbl_error = ctk.CTkLabel(self, text="", font=("Arial", 12), text_color="red")
         self.lbl_error.pack(pady = 5)
@@ -117,7 +120,7 @@ class ModificarApp(ctk.CTkToplevel):
         self.btn_back.pack(pady = 2, side="bottom")
 
         self.after(100, self.entry_barcode.focus)
-    def modificar_producto(self, event):
+    def modify_product(self, event):
         barcode = self.entry_barcode.get().strip()
         self.product_to_modify = db.get_product_by_code(barcode)
 
@@ -162,6 +165,9 @@ class ModificarApp(ctk.CTkToplevel):
         if new_price_txt:
             try:
                 new_price = float(new_price_txt)
+                if new_price <= 0:
+                    self.lbl_error.configure(text="El precio debe ser un número mayor a 0.", text_color="red")
+                    return
             except ValueError:
                 self.lbl_error.configure(text="El valor en precio no es válido.")
                 return

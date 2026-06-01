@@ -47,6 +47,12 @@ class SalesAPP(ctk.CTkToplevel):
         elif barcode.startswith("."):
             try:
                 manual_price = float(barcode[1:])
+                
+                if manual_price <= 0:
+                    self.lbl_error.configure(text="El monto debe ser mayor a 0.", text_color="red")
+                    self.entry_barcode.delete(0, "end")
+                    return
+                
                 self.total_purchease += manual_price
                 
                 self.lbl_error.configure(text="")

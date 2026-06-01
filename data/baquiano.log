@@ -1,1 +1,12 @@
 2026-05-28 13:43:40,911 - ERROR - Error al borrar producto (Código: 1): no such table: productos_ROTTS
+2026-06-01 14:07:36,219 - ERROR - Intento de insertar producto con precio inválido (-500.0).
+2026-06-01 14:07:41,202 - ERROR - Intento de insertar producto con precio inválido (-500.0).
+2026-06-01 14:07:42,061 - ERROR - Intento de insertar producto con precio inválido (-500.0).
+2026-06-01 14:07:42,249 - ERROR - Intento de insertar producto con precio inválido (-500.0).
+2026-06-01 14:07:42,405 - ERROR - Intento de insertar producto con precio inválido (-500.0).
+2026-06-01 14:07:42,561 - ERROR - Intento de insertar producto con precio inválido (-500.0).
+2026-06-01 14:08:02,997 - ERROR - Intento de insertar producto con precio inválido (-50.0).
+2026-06-01 14:08:03,825 - ERROR - Intento de insertar producto con precio inválido (-50.0).
+2026-06-01 14:08:03,981 - ERROR - Intento de insertar producto con precio inválido (-50.0).
+2026-06-01 14:08:04,122 - ERROR - Intento de insertar producto con precio inválido (-50.0).
+2026-06-01 14:28:31,510 - ERROR - Intento de insertar producto con precio inválido (-50.0).
