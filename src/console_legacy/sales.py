@@ -21,7 +21,7 @@ while True:
             print(f"TOTAL FINAL: {total_cuenta}")
             input("\nPresiona Enter para el siguiente cliente...") # Pausa para que el cajero vea el total
             break
-        elif codigo_producto.startswith("+"):
+        elif codigo_producto.startswith("."):
             try:
                 # Quitamos el '+' y convertimos el resto a número
                 monto_manual = float(codigo_producto[1:]) 
