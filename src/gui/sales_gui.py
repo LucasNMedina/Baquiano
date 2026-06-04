@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import src.core.database as db
+from src.services.ticket_printer import imprimir_ticket_systel
 
 class SalesAPP(ctk.CTkToplevel):
     def __init__(self, parent=None, **kwargs):
@@ -9,7 +10,8 @@ class SalesAPP(ctk.CTkToplevel):
         self.grab_set()
 
         self.total_purchease = 0.0
-        
+        self.productos_actuales = [] #para el ticket
+
         #Label código de barras
         self.lbl_entry_barcode = ctk.CTkLabel(self, text="Escaneá el código de barras: ", font=("Arial", 15))
         self.lbl_entry_barcode.pack(pady = 5)
@@ -18,6 +20,16 @@ class SalesAPP(ctk.CTkToplevel):
         self.entry_barcode = ctk.CTkEntry(self, width=300)
         self.entry_barcode.pack(pady = 5)
         self.entry_barcode.bind("<Return>", self.sell_product)
+
+        # --- NUEVO COMPONENTE: CHECKBOX PARA EL TICKET ---
+        self.check_ticket_var = ctk.BooleanVar(value=True) # Activado por defecto
+        self.checkbox_ticket = ctk.CTkCheckBox(
+            self, 
+            text="¿Imprimir Ticket?", 
+            variable=self.check_ticket_var,
+            font=("Arial", 14)
+        )
+        self.checkbox_ticket.pack(pady = 5, side="bottom")
 
         self.btn_end_sale = ctk.CTkButton(self, text="Terminar Venta", command=self.end_sale, font=("Arial", 14, "bold"))
         self.btn_end_sale.pack(pady = 10, side="bottom")
@@ -43,6 +55,14 @@ class SalesAPP(ctk.CTkToplevel):
             self.total_purchease += product.price
             self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}")
             self.update_textbox(product.name, product.price)
+
+            # Guardamos el producto en nuestra lista para el ticket (cantidad fija 1 por escaneo)
+            self.productos_actuales.append({
+                "cantidad": 1,
+                "nombre": product.name,
+                "precio_total": product.price
+            })
+
             self.entry_barcode.delete(0, "end")
         elif barcode.startswith("."):
             try:
@@ -58,6 +78,14 @@ class SalesAPP(ctk.CTkToplevel):
                 self.lbl_error.configure(text="")
                 self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}")
                 self.update_textbox("Fiambreria", manual_price)
+
+                # Guardamos la venta manual en nuestra lista para el ticket
+                self.productos_actuales.append({
+                    "cantidad": 1,
+                    "nombre": "Fiambreria",
+                    "precio_total": manual_price
+                })
+
                 self.entry_barcode.delete(0, "end")
             except ValueError:
                 self.lbl_error.configure(text="Debés ingresar un monto valido.", text_color = "red")
@@ -74,13 +102,27 @@ class SalesAPP(ctk.CTkToplevel):
                 self.lbl_error.configure(text="No hay productos en la venta actual.", text_color="red")
                 return
             
+            # --- MANDAR A IMPRIMIR SI EL CHECKBOX ESTÁ ACTIVO ---
+            if self.check_ticket_var.get():
+                # Cambiá "COM3" por el puerto real que use la Systel en el mostrador
+                exito_ticket = imprimir_ticket_systel(self.productos_actuales, self.total_purchease, puerto_com="COM3")
+                if not exito_ticket:
+                    # Si falla por un cable desconectado o puerto apagado, avisa en rojo pero te deja continuar
+                    self.lbl_error.configure(text="Error de tiquetera. Venta guardada igualmente.", text_color="red")
+            
             self.entry_barcode.configure(state="disabled")
             self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}", text_color="green")
-            self.lbl_error.configure(text="Venta registrada. Presioná para continuar.", text_color="green")
+            #self.lbl_error.configure(text="Venta registrada. Presioná para continuar.", text_color="green")
+
+            # Si no hubo error previo de ticket, mostramos el éxito común
+            if self.lbl_error.cget("text") == "":
+                self.lbl_error.configure(text="Venta registrada. Presioná para continuar.", text_color="green")
+
             self.btn_end_sale.configure(text="Nueva Venta")
         
         else:
             self.total_purchease = 0.0
+            self.productos_actuales = []
             self.entry_barcode.configure(state="normal")
             
             self.lbl_total.configure(text=f"Total: ${self.total_purchease:.2f}", text_color="orange")
