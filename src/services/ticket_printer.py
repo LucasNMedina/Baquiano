@@ -5,26 +5,23 @@ import datetime
 def encontrar_puerto_tiquetera():
     """
     Busca automáticamente el puerto COM donde está el adaptador USB-Serial
-    o la tiquetera basándose en los nombres de hardware más comunes.
+    ignorando los puertos nativos fantasmas de la placa madre.
     """
     puertos = list(serial.tools.list_ports.comports())
     
-    # 1. Intentamos buscar por palabras clave comunes de chips seriales (Prolific, CH340, FTDI, USB)
+    # 1. Buscamos estrictamente por palabras clave del chip del cable
     for p in puertos:
         descripcion = p.description.lower()
         if "prolific" in descripcion or "usb-to-serial" in descripcion or "ch340" in descripcion or "ftdi" in descripcion:
             return p.device
             
-    # 2. Si no encontró por palabra clave, pero hay al menos un puerto COM activo que no sea el COM1 nativo
-    # (Los adaptadores USB-Serial suelen tomar números más altos como COM2, COM3, COM4...)
+    # 2. Si no encuentra por nombre, pero hay puertos USB-Serial genéricos que NO sean el COM1 de la placa
     for p in puertos:
-        if p.device != "COM1":
+        # Filtramos el COM1 y strings comunes de puertos internos de Windows
+        if p.device != "COM1" and "com1" not in p.description.lower():
             return p.device
-            
-    # 3. Último recurso: si hay un solo puerto libre, tiramos a ese
-    if puertos:
-        return puertos[0].device
         
+    # Si no hay cables USB-Serial reales conectados, no inventamos ningún puerto
     return None
 
 def imprimir_ticket_systel(lista_productos, total, puerto_com=None):
