@@ -1,44 +1,76 @@
 import serial
+import serial.tools.list_ports
 import datetime
 
-def imprimir_ticket_systel(lista_productos, total, puerto_com="COM3"):
+def encontrar_puerto_tiquetera():
+    """
+    Busca automáticamente el puerto COM donde está el adaptador USB-Serial
+    o la tiquetera basándose en los nombres de hardware más comunes.
+    """
+    puertos = list(serial.tools.list_ports.comports())
+    
+    # 1. Intentamos buscar por palabras clave comunes de chips seriales (Prolific, CH340, FTDI, USB)
+    for p in puertos:
+        descripcion = p.description.lower()
+        if "prolific" in descripcion or "usb-to-serial" in descripcion or "ch340" in descripcion or "ftdi" in descripcion:
+            return p.device
+            
+    # 2. Si no encontró por palabra clave, pero hay al menos un puerto COM activo que no sea el COM1 nativo
+    # (Los adaptadores USB-Serial suelen tomar números más altos como COM2, COM3, COM4...)
+    for p in puertos:
+        if p.device != "COM1":
+            return p.device
+            
+    # 3. Último recurso: si hay un solo puerto libre, tiramos a ese
+    if puertos:
+        return puertos[0].device
+        
+    return None
+
+def imprimir_ticket_systel(lista_productos, total, puerto_com=None):
     """
     Envía el ticket condensado directamente a la tiquetera Systel GP-5890XIII.
-    Solo incluye los productos, el total de la compra y la fecha/hora.
+    Si puerto_com es None, busca el puerto automáticamente.
     """
     try:
-        # 1. Abrimos la conexión con el puerto Serial (9600 baudios es el estándar de Systel)
+        # --- DETECCIÓN AUTOMÁTICA DEL PUERTO ---
+        if puerto_com is None:
+            puerto_com = encontrar_puerto_tiquetera()
+            if puerto_com is None:
+                print("Error: No se detectó ningún puerto COM activo.")
+                return False
+        
+        print(f"Conectando a la tiquetera en el puerto: {puerto_com}")
+        
+        # 1. Abrimos la conexión con el puerto encontrado
         ser = serial.Serial(puerto_com, baudrate=9600, timeout=1)
         
         # --- COMANDOS ESC/POS NATIVOS ---
-        TXT_RESET = b'\x1b\x40'          # Limpia el búfer y resetea la impresora
-        TXT_CENTRO = b'\x1b\x61\x01'     # Alinear al centro
-        TXT_IZQUIERDA = b'\x1b\x61\x00'  # Alinear a la izquierda
-        TXT_DERECHA = b'\x1b\x61\x02'    # Alinear a la derecha
-        TXT_NEGRITA_ON = b'\x1b\x45\x01' # Activar negrita
-        TXT_NEGRITA_OFF = b'\x1b\x45\x00'# Desactivar negrita
+        TXT_RESET = b'\x1b\x40'          
+        TXT_CENTRO = b'\x1b\x61\x01'     
+        TXT_IZQUIERDA = b'\x1b\x61\x00'  
+        TXT_DERECHA = b'\x1b\x61\x02'    
+        TXT_NEGRITA_ON = b'\x1b\x45\x01' 
+        TXT_NEGRITA_OFF = b'\x1b\x45\x00'
         
         # 2. Inicializar e imprimir Encabezado
         ser.write(TXT_RESET)
         ser.write(TXT_CENTRO + TXT_NEGRITA_ON + b"*** BAQUIANO ***\n" + TXT_NEGRITA_OFF)
         ser.write(b"Fiambreria & Almacen\n")
-        ser.write(TXT_IZQUIERDA + b"--------------------------------\n") # 32 guiones para papel de 58mm
+        ser.write(TXT_IZQUIERDA + b"--------------------------------\n")
         
         # 3. Detalle de Productos
-        # Estructura de 32 caracteres: Cant (4) + Detalle (17) + Precio (11)
         for prod in lista_productos:
             cant_str = f"{prod['cantidad']}x"
-            # Limitamos el nombre a 17 letras para que no se pase al renglón de abajo y desalinee
             nombre_str = prod['nombre'][:17].ljust(17) 
             precio_str = f"${prod['precio_total']:>9.2f}"
             
             linea = f"{cant_str:<4}{nombre_str}{precio_str}\n"
-            # Usamos cp437 para que imprima bien la 'ñ' y los acentos en la tiquetera
             ser.write(linea.encode('cp437')) 
             
         ser.write(b"--------------------------------\n")
         
-        # 4. TOTAL (Destacado en negrita y alineado a la derecha)
+        # 4. TOTAL
         ser.write(TXT_DERECHA + TXT_NEGRITA_ON)
         ser.write(f"TOTAL:   ${total:>10.2f}\n".encode('utf-8'))
         ser.write(TXT_NEGRITA_OFF)
@@ -47,7 +79,6 @@ def imprimir_ticket_systel(lista_productos, total, puerto_com="COM3"):
         fecha_hora = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
         ser.write(TXT_CENTRO + f"\n{fecha_hora}\n\n".encode('utf-8'))
         
-        # Avanzar el papel para que pase la línea de corte física de la máquina
         ser.write(b"\n\n\n\n") 
         
         # 6. Cerrar el puerto de comunicación

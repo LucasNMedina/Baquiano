@@ -105,7 +105,7 @@ class SalesAPP(ctk.CTkToplevel):
             # --- MANDAR A IMPRIMIR SI EL CHECKBOX ESTÁ ACTIVO ---
             if self.check_ticket_var.get():
                 # Cambiá "COM3" por el puerto real que use la Systel en el mostrador
-                exito_ticket = imprimir_ticket_systel(self.productos_actuales, self.total_purchease, puerto_com="COM3")
+                exito_ticket = imprimir_ticket_systel(self.productos_actuales, self.total_purchease)
                 if not exito_ticket:
                     # Si falla por un cable desconectado o puerto apagado, avisa en rojo pero te deja continuar
                     self.lbl_error.configure(text="Error de tiquetera. Venta guardada igualmente.", text_color="red")
