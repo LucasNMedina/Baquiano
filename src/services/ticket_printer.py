@@ -1,12 +1,45 @@
 import win32print
 import datetime
 
-def imprimir_ticket_systel(lista_productos, total, nombre_impresora="Generic / Text Only"):
+def buscar_tiquetera_automatica():
     """
-    Envía el ticket formateado directamente a la tiquetera Systel GP-5890XIII
-    utilizando el sistema de colas de impresión de Windows.
+    Recorre todas las impresoras instaladas en Windows y devuelve el nombre
+    de la primera que encuentre que sea genérica (tiquetera).
     """
     try:
+        # Le pedimos a Windows la lista de todas las impresoras locales
+        impresoras = win32print.EnumPrinters(win32print.PRINTER_ENUM_LOCAL | win32print.PRINTER_ENUM_CONNECTIONS)
+        
+        for impresora in impresoras:
+            nombre_impresora = impresora[2]  # Índice 2 contiene el nombre en texto
+            nombre_min = nombre_impresora.lower()
+            
+            # Si contiene 'generic', 'text' o 'only', encontramos la tiquetera (con o sin Copia 1)
+            if "generic" in nombre_min or "text" in nombre_min or "only" in nombre_min:
+                print(f"-> Tiquetera detectada automáticamente: {nombre_impresora}")
+                return nombre_impresora
+    except Exception as e:
+        print(f"Error al buscar impresoras en Windows: {e}")
+    
+    # Si no encuentra ninguna, devuelve None
+    return None
+
+def imprimir_ticket_systel(lista_productos, total, nombre_impresora=None):
+    """
+    Envía el ticket formateado directamente a la tiquetera Systel GP-5890XIII
+    utilizando detección automática de nombre para evitar errores de puertos.
+    """
+    try:
+        # --- DETECCIÓN INTELIGENTE DE NOMBRE ---
+        # Si no le pasamos un nombre específico, o si el que viene por defecto falla, busca sola
+        if nombre_impresora is None or nombre_impresora == "Generic / Text Only":
+            nombre_detectado = buscar_tiquetera_automatica()
+            if nombre_detectado:
+                nombre_impresora = nombre_detectado
+            else:
+                # Si no detectó nada, dejamos el de por defecto para que intente igual
+                nombre_impresora = "Generic / Text Only"
+
         print(f"Conectando a la tiquetera mediante Windows: {nombre_impresora}")
         
         # 1. Abrimos la conexión con la impresora de Windows
