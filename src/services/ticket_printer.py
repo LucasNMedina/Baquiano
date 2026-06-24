@@ -27,18 +27,34 @@ def buscar_tiquetera_automatica():
 def imprimir_ticket_systel(lista_productos, total, nombre_impresora=None):
     """
     Envía el ticket formateado directamente a la tiquetera Systel GP-5890XIII
-    utilizando detección automática de nombre para evitar errores de puertos.
+    utilizando detección automática de nombre y plan de emergencia.
     """
     try:
         # --- DETECCIÓN INTELIGENTE DE NOMBRE ---
-        # Si no le pasamos un nombre específico, o si el que viene por defecto falla, busca sola
+        # Si no le pasamos un nombre específico, o si viene el genérico por defecto, busca de forma inteligente
         if nombre_impresora is None or nombre_impresora == "Generic / Text Only":
             nombre_detectado = buscar_tiquetera_automatica()
             if nombre_detectado:
                 nombre_impresora = nombre_detectado
             else:
-                # Si no detectó nada, dejamos el de por defecto para que intente igual
-                nombre_impresora = "Generic / Text Only"
+                # 🚨 PLAN DE EMERGENCIA ABSOLUTO: Si falló el "Generic", buscamos CUALQUIER tiquetera física activa
+                print("⚠️ Alerta: No se encontró 'Generic'. Iniciando plan de emergencia...")
+                try:
+                    impresoras_locales = win32print.EnumPrinters(win32print.PRINTER_ENUM_LOCAL)
+                    for imp in impresoras_locales:
+                        nom = imp[2]
+                        nom_min = nom.lower()
+                        # Descartamos las virtuales de Windows para no mandar el ticket a un PDF o Fax
+                        if "pdf" not in nom_min and "xps" not in nom_min and "fax" not in nom_min and "onenote" not in nom_min:
+                            print(f"🚨 ¡Comodín de emergencia activado! Imprimiendo en: {nom}")
+                            nombre_impresora = nom
+                            break
+                except Exception as err_emergencia:
+                    print(f"Error en el plan de emergencia: {err_emergencia}")
+                
+                # Si todo, absolutamente todo falla, dejamos el de por defecto para intentar la conexión igual
+                if not nombre_impresora or nombre_impresora == "Generic / Text Only":
+                    nombre_impresora = "Generic / Text Only"
 
         print(f"Conectando a la tiquetera mediante Windows: {nombre_impresora}")
         
