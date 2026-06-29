@@ -220,7 +220,7 @@ class EliminarAPP(ctk.CTkToplevel):
         
         self.after(100, self.entry_barcode.focus)
     def ventana_eliminar(self, event):
-        barcode = self.entry_barcode.get()
+        barcode = self.entry_barcode.get().strip()
         self.product_to_eliminate = db.get_product_by_code(barcode)
 
         if self.product_to_eliminate:
@@ -285,7 +285,7 @@ class MostrarAPP(ctk.CTkToplevel):
 
         self.after(100, self.entry_barcode.focus)
     def ventana_mostrar(self, event):
-        barcode = self.entry_barcode.get()
+        barcode = self.entry_barcode.get().strip()
         self.product_to_show = db.get_product_by_code(barcode)
 
         if self.product_to_show:
